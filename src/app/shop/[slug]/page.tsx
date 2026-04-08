@@ -2,16 +2,18 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export default async function ProductPage({ params }: Props) {
+  const { slug } = await params
+
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   })
 
   if (!product || !product.isActive) {
-    return notFound()
+    notFound()
   }
 
   return (

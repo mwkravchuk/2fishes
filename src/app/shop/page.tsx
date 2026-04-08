@@ -18,7 +18,7 @@ export default async function ShopPage() {
         {products.map((product) => (
           <a
             key={product.id}
-            href={`/products/${product.slug}`}
+            href={`/shop/${product.slug}`}
             className="group block"
           >
             {/* Image placeholder */}
