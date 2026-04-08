@@ -1,0 +1,17 @@
+import { ReactNode } from "react";
+import SiteHeader from "@/components/SiteHeader";
+
+type SiteShellProps = {
+  children: ReactNode;
+};
+
+export default function SiteShell({ children }: SiteShellProps) {
+  return (
+    <main className="min-h-screen bg-(--background)] px-4 py-4 text-(--foreground)]">
+      <div className="flex min-h-[calc(100vh-2rem)] flex-col">
+        <SiteHeader />
+        {children}
+      </div>
+    </main>
+  );
+}

@@ -1,41 +1,56 @@
-import { prisma } from '@/lib/prisma'
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import SiteShell from "@/components/SiteShell";
 
 export default async function ShopPage() {
   const products = await prisma.product.findMany({
     where: { isActive: true },
-    orderBy: { createdAt: 'desc' },
-  })
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
-    <main className="px-6 py-12">
-      {/* Title */}
-      <h1 className="text-[64px] leading-none tracking-tight mb-16">
-        Shop
-      </h1>
+    <SiteShell>
+      <section className="mt-16 pb-16">
+        {products.length === 0 ? (
+          <p className="mt-12 text-[22px]">No coffees available right now.</p>
+        ) : (
+          <div className="mt-12 flex justify-center flex-wrap gap-x-20 gap-y-16">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/shop/${product.slug}`}
+                className="group block w-full max-w-[380px]"
+              >
+                <div className="aspect-[4/5] overflow-hidden bg-[#d8d0c4]">
+                  {product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : null}
+                </div>
 
-      {/* Product grid */}
-      <div className="grid grid-cols-2 gap-16">
-        {products.map((product) => (
-          <a
-            key={product.id}
-            href={`/shop/${product.slug}`}
-            className="group block"
-          >
-            {/* Image placeholder */}
-            <div className="bg-gray-200 h-[320px] mb-4" />
+                <div className="mt-3">
+                  <p className="text-[24px] leading-[1.05] group-hover:underline">
+                    {product.name}
+                  </p>
+                  <p className="text-[22px] leading-[1.05]">
+                    ${Number(product.priceCents/100).toFixed(2)}
+                  </p>
 
-            {/* Name */}
-            <h2 className="text-xl tracking-tight group-hover:underline">
-              {product.name}
-            </h2>
-
-            {/* Price */}
-            <p className="text-sm text-gray-500">
-              ${(product.priceCents / 100).toFixed(2)}
-            </p>
-          </a>
-        ))}
-      </div>
-    </main>
-  )
+                  <div className="mt-2 min-h-[48px]">
+                    <div className="invisible group-hover:visible text-[18px] leading-[1.1]">
+                      {product.origin ? <p>{product.origin}</p> : null}
+                      {product.notes ? <p>{product.notes}</p> : null}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+    </SiteShell>
+  );
 }
