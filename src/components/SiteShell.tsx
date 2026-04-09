@@ -7,7 +7,7 @@ type SiteShellProps = {
 
 export default function SiteShell({ children }: SiteShellProps) {
   return (
-    <main className="min-h-screen bg-(--background)] px-4 py-4 text-(--foreground)]">
+    <main className="min-h-screen bg-(--background)] text-(--foreground)]">
       <div className="flex min-h-[calc(100vh-2rem)] flex-col">
         <SiteHeader />
         {children}

@@ -1,49 +1,49 @@
-import "dotenv/config";
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, GrindOption, BagSize } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.product.upsert({
-    where: { slug: "ethiopia-light-roast" },
-    update: {},
-    create: {
-      slug: "ethiopia-light-roast",
-      name: "Ethiopia Light Roast",
-      description: "Bright and citrus-forward with floral notes and a clean finish.",
-      priceCents: 2000,
-      imageUrl:
-        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
-      isActive: true,
-    },
-  });
+  await prisma.product.deleteMany();
 
-  await prisma.product.upsert({
-    where: { slug: "house-espresso" },
-    update: {},
-    create: {
-      slug: "house-espresso",
-      name: "House Espresso",
-      description: "Chocolatey, balanced, and easy to drink every day.",
-      priceCents: 1800,
-      imageUrl:
-        "https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&q=80",
-      isActive: true,
-    },
-  });
-
-  await prisma.product.upsert({
-    where: { slug: "colombia-rotation" },
-    update: {},
-    create: {
-      slug: "colombia-rotation",
-      name: "Colombia Rotation",
-      description: "Soft fruit sweetness and caramel in a rotating single-origin roast.",
-      priceCents: 2200,
-      imageUrl:
-        "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
-      isActive: true,
-    },
+  await prisma.product.createMany({
+    data: [
+      {
+        slug: "ethiopia-yirgacheffe",
+        name: "Ethiopia Yirgacheffe",
+        description: "A bright washed Ethiopian coffee with a floral, citrus-forward cup.",
+        origin: "Yirgacheffe, Ethiopia",
+        flavorNotes: ["jasmine", "citrus", "honey"],
+        priceCents: 2200,
+        imageUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085",
+        isActive: true,
+        availableGrinds: [GrindOption.whole_bean],
+        availableSizes: [BagSize.oz12],
+      },
+      {
+        slug: "colombia-huila",
+        name: "Colombia Huila",
+        description: "Balanced and sweet with a soft body and approachable profile.",
+        origin: "Huila, Colombia",
+        flavorNotes: ["caramel", "red fruit", "cocoa"],
+        priceCents: 2000,
+        imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93",
+        isActive: true,
+        availableGrinds: [GrindOption.whole_bean],
+        availableSizes: [BagSize.oz12],
+      },
+      {
+        slug: "guatemala-huehuetenango",
+        name: "Guatemala Huehuetenango",
+        description: "A structured cup with chocolate depth and subtle fruit.",
+        origin: "Huehuetenango, Guatemala",
+        flavorNotes: ["chocolate", "orange", "brown sugar"],
+        priceCents: 2100,
+        imageUrl: "https://images.unsplash.com/photo-1447933601403-0c6688de566e",
+        isActive: true,
+        availableGrinds: [GrindOption.whole_bean],
+        availableSizes: [BagSize.oz12],
+      },
+    ],
   });
 }
 

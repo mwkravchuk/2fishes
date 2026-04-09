@@ -13,16 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum GrindOption {
+  whole_bean
+}
+
+enum BagSize {
+  oz12
+}
+
 model Product {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id   String @id @default(cuid())
+  slug String @unique
+
   name        String
   description String
-  priceCents  Int
-  imageUrl    String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  origin      String
+  flavorNotes String[]
+
+  priceCents Int
+  imageUrl   String
+  isActive   Boolean @default(true)
+
+  availableGrinds GrindOption[] @default([whole_bean])
+  availableSizes  BagSize[]     @default([oz12])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   orderItems OrderItem[]
 }
@@ -46,6 +62,9 @@ model OrderItem {
   productNameSnap String
   unitPriceCents  Int
   quantity        Int
+
+  selectedGrind GrindOption
+  selectedSize  BagSize
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])

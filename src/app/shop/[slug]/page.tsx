@@ -1,46 +1,78 @@
-import { prisma } from '@/lib/prisma'
-import { notFound } from 'next/navigation'
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import SiteShell from "@/components/SiteShell";
+import AddToCartForm from "@/components/AddToCartForm";
 
-type Props = {
-  params: Promise<{ slug: string }>
-}
+type ProductDetailPageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
-export default async function ProductPage({ params }: Props) {
-  const { slug } = await params
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  const { slug } = await params;
 
   const product = await prisma.product.findUnique({
     where: { slug },
-  })
+  });
 
   if (!product || !product.isActive) {
-    notFound()
+    notFound();
   }
 
   return (
-    <main className="px-6 py-12">
-      {/* Large title */}
-      <h1 className="text-[72px] leading-none tracking-tight mb-12">
-        {product.name}
-      </h1>
+    <SiteShell>
+      <section className="mt-12 pb-20">
+        <div className="mx-auto max-w-[800px]">
+          {/* Title */}
+          <h1 className="font-display text-[54px] leading-[0.92] mb-4 -ml-8 md:-ml-16">{product.name}</h1>
 
-      {/* Layout */}
-      <div className="grid grid-cols-2 gap-16 items-start">
-        {/* Left: text */}
-        <div className="space-y-6 text-lg leading-relaxed">
-          <p>{product.description}</p>
+          {/* Two-column body */}
+          <div className="mt-8 flex flex-col gap-10 md:flex-row md:items-start md:gap-12">
+            {/* Left: image */}
+            <div className="w-full md:w-[50%]">
+              <div className="aspect-[5/5] overflow-hidden bg-[#d8d0c4]">
+                {product.imageUrl ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : null}
+              </div>
+            </div>
 
-          <p className="text-xl">
-            ${(product.priceCents / 100).toFixed(2)}
-          </p>
+            {/* Right: product info + controls */}
+            <div className="w-full md:w-[48%]">
+              <div className="space-y-6">
+                <p className="text-[18px] leading-[1.05]">
+                  {product.description}
+                </p>
 
-          <button className="underline text-lg">
-            Add to cart
-          </button>
+                <p className="text-[18px] leading-[1.1]">
+                  ({product.flavorNotes.join(", ")})
+                </p>
+
+                <p className="text-[18px] leading-[1.05]">
+                  ${(product.priceCents / 100).toFixed(2)}
+                </p>
+              </div>
+
+              <div className="mt-14">
+                <AddToCartForm
+                  productId={product.id}
+                  productName={product.name}
+                  unitPriceCents={product.priceCents}
+                  selectedSize="12oz"
+                  selectedGrind="whole_bean"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-
-        {/* Right: image */}
-        <div className="bg-gray-200 h-[420px]" />
-      </div>
-    </main>
-  )
+      </section>
+    </SiteShell>
+  );
 }
