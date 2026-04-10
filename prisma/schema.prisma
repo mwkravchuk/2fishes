@@ -55,6 +55,8 @@ model Order {
 
   stripeCheckoutSessionId String  @unique
   stripePaymentIntentId   String? @unique
+  trackingCarrier         String?
+  trackingNumber          String?
 
   shippingName    String?
   shippingLine1   String?

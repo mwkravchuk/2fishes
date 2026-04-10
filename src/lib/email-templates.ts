@@ -44,6 +44,18 @@ function formatGrind(grind: string) {
   }
 }
 
+function buildShippingLines(order: OrderEmailData) {
+  return [
+    order.shippingName,
+    order.shippingLine1,
+    order.shippingLine2,
+    [order.shippingCity, order.shippingState, order.shippingZip]
+      .filter(Boolean)
+      .join(", "),
+    order.shippingCountry,
+  ].filter(Boolean) as string[];
+}
+
 export function buildCustomerOrderConfirmationEmail(order: OrderEmailData) {
   const itemsHtml = order.items
     .map(
@@ -64,18 +76,10 @@ export function buildCustomerOrderConfirmationEmail(order: OrderEmailData) {
     )
     .join("\n");
 
-  const shippingLines = [
-    order.shippingName,
-    order.shippingLine1,
-    order.shippingLine2,
-    [order.shippingCity, order.shippingState, order.shippingZip]
-      .filter(Boolean)
-      .join(", "),
-    order.shippingCountry,
-  ].filter(Boolean);
+  const shippingLines = buildShippingLines(order);
 
   return {
-    subject: `Order confirmation — #${order.orderId}`,
+    subject: `We have received your order.`,
     html: `
       <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
         <h1 style="font-size: 28px; margin-bottom: 16px;">Thank you for your order!</h1>
@@ -134,7 +138,7 @@ export function buildInternalNewOrderEmail(order: OrderEmailData) {
     .join("\n");
 
   return {
-    subject: `New order received — #${order.orderId}`,
+    subject: `New order received.`,
     html: `
       <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
         <h1 style="font-size: 24px; margin-bottom: 16px;">New order received</h1>
@@ -152,6 +156,67 @@ Email: ${order.customerEmail}
 Total: ${formatPrice(order.totalCents)}
 
 ${itemsText}
+    `.trim(),
+  };
+}
+
+export function buildOrderFulfilledEmail(order: OrderEmailData & {
+  trackingCarrier?: string | null;
+  trackingNumber?: string | null;
+}) {
+  const shippingLines = buildShippingLines(order);
+
+  const itemsText = order.items
+    .map(
+      (item) =>
+        `- ${item.productNameSnap} — ${formatBagSize(item.selectedSize)} / ${formatGrind(item.selectedGrind)} x${item.quantity}`
+    )
+    .join("\n");
+
+  const trackingText =
+    order.trackingNumber
+      ? `Tracking: ${order.trackingCarrier ? `${order.trackingCarrier} ` : ""}${order.trackingNumber}`
+      : "Tracking information: not provided";
+
+  return {
+    subject: `Your order is on the way!`,
+    html: `
+      <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
+        <h1 style="font-size: 28px; margin-bottom: 16px;">Your order is on the way!</h1>
+
+        <p>Your order <strong>#${order.orderId}</strong> has been fulfilled.</p>
+
+        ${
+          order.trackingNumber
+            ? `<p><strong>Tracking:</strong> ${order.trackingCarrier ? `${order.trackingCarrier} ` : ""}${order.trackingNumber}</p>`
+            : ""
+        }
+
+        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Order summary</h2>
+        <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${itemsText}</pre>
+
+        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Shipping to</h2>
+        <div>
+          ${shippingLines.map((line) => `<p style="margin: 2px 0;">${line}</p>`).join("")}
+        </div>
+
+        <p style="margin-top: 32px;">If anything looks off, just reply to this email.</p>
+      </div>
+    `,
+    text: `
+Your order is on the way
+
+Your order #${order.orderId} has been fulfilled.
+
+${trackingText}
+
+Order summary:
+${itemsText}
+
+Shipping to:
+${shippingLines.join("\n")}
+
+If anything looks off, just reply to this email.
     `.trim(),
   };
 }
