@@ -45,13 +45,27 @@ model Product {
 }
 
 model Order {
-  id                String   @id @default(cuid())
+  id                String @id @default(cuid())
   customerEmail     String
   paymentStatus     String
   fulfillmentStatus String
+  subtotalCents     Int
+  shippingCents     Int
   totalCents        Int
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+
+  stripeCheckoutSessionId String  @unique
+  stripePaymentIntentId   String? @unique
+
+  shippingName    String?
+  shippingLine1   String?
+  shippingLine2   String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+  shippingCountry String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   items OrderItem[]
 }

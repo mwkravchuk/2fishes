@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import SiteShell from "@/components/SiteShell";
 import QuantityControls from "@/components/QuantityControls";
 import RemoveItemButton from "@/components/RemoveItemButton";
+import CheckoutButton from "@/components/CheckoutButton";
 import {
   CART_COOKIE_NAME,
   formatBagSize,
@@ -99,12 +100,7 @@ export default async function CartPage() {
                   </div>
 
                   <div className="mt-8">
-                    <button
-                      type="button"
-                      className="w-full border border-black px-5 py-3.5 text-[18px] leading-none cursor-pointer hover:underline"
-                    >
-                      Continue to checkout
-                    </button>
+                    <CheckoutButton />
                   </div>
 
                   <p className="mt-4 text-[16px] leading-[1.2]">
