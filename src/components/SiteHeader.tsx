@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CartCountLink from "./CartCountLink";
 
 export default function SiteHeader() {
   return (
@@ -16,9 +17,7 @@ export default function SiteHeader() {
         </Link>
       </div>
 
-      <Link href="/cart" className="pr-4 text-[16px] hover:underline">
-        Cart
-      </Link>
+      <CartCountLink />
     </nav>
   );
 };

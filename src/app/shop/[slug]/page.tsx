@@ -63,9 +63,7 @@ export default async function ProductDetailPage({
               <div className="mt-14">
                 <AddToCartForm
                   productId={product.id}
-                  productName={product.name}
-                  unitPriceCents={product.priceCents}
-                  selectedSize="12oz"
+                  selectedSize="oz12"
                   selectedGrind="whole_bean"
                 />
               </div>

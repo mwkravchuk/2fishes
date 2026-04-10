@@ -1,32 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { BagSize, GrindOption } from "@prisma/client";
+import { emitCartChanged } from "@/lib/cart-events";
 
 type AddToCartFormProps = {
   productId: string;
-  productName: string;
-  unitPriceCents: number;
-  selectedSize: string;
-  selectedGrind: string;
-};
-
-type CartItem = {
-  productId: string;
-  productName: string;
-  unitPriceCents: number;
-  selectedSize: string;
-  selectedGrind: string;
-  quantity: number;
+  selectedSize: BagSize;
+  selectedGrind: GrindOption;
 };
 
 export default function AddToCartForm({
   productId,
-  productName,
-  unitPriceCents,
   selectedSize,
   selectedGrind,
 }: AddToCartFormProps) {
   const [quantity, setQuantity] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   function decrement() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -36,55 +34,77 @@ export default function AddToCartForm({
     setQuantity((q) => q + 1);
   }
 
-  function handleAddToCart() {
-    const existingCart = localStorage.getItem("cart");
-    const cart: CartItem[] = existingCart ? JSON.parse(existingCart) : [];
+  function showTemporaryMessage(nextMessage: string) {
+    setMessage(nextMessage);
 
-    const existingItemIndex = cart.findIndex(
-      (item) =>
-        item.productId === productId &&
-        item.selectedSize === selectedSize &&
-        item.selectedGrind === selectedGrind
-    );
-
-    if (existingItemIndex >= 0) {
-      cart[existingItemIndex].quantity += quantity;
-    } else {
-      cart.push({
-        productId,
-        productName,
-        unitPriceCents,
-        selectedSize,
-        selectedGrind,
-        quantity,
-      });
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+    timeoutRef.current = setTimeout(() => {
+      setMessage(null);
+    }, 2500);
+  }
+
+  async function handleAddToCart() {
+    try {
+      setIsSubmitting(true);
+      setMessage(null);
+
+      const response = await fetch("/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          selectedSize,
+          selectedGrind,
+          quantity,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Failed to add item to cart");
+      }
+
+      emitCartChanged(data.itemCount);
+      showTemporaryMessage("Added to cart");
+    } catch (error) {
+      console.error(error);
+      showTemporaryMessage(
+        error instanceof Error ? error.message : "Failed to add item to cart"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div>
       <div className="space-y-5">
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-3">
+        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
           <span className="text-[18px] leading-none">Size</span>
           <span className="text-[18px] leading-none">12 oz</span>
         </div>
 
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-3">
+        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
           <span className="text-[18px] leading-none">Grind</span>
           <span className="text-[18px] leading-none">Whole bean</span>
         </div>
 
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-3">
+        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
           <span className="text-[18px] leading-none">Quantity</span>
 
           <div className="flex items-center gap-5 text-[18px] leading-none">
             <button
               type="button"
               onClick={decrement}
-              className="hover:underline cursor-pointer"
+              className="cursor-pointer hover:underline"
               aria-label="Decrease quantity"
+              disabled={isSubmitting}
             >
               -
             </button>
@@ -94,8 +114,9 @@ export default function AddToCartForm({
             <button
               type="button"
               onClick={increment}
-              className="hover:underline cursor-pointer"
+              className="cursor-pointer hover:underline"
               aria-label="Increase quantity"
+              disabled={isSubmitting}
             >
               +
             </button>
@@ -107,10 +128,15 @@ export default function AddToCartForm({
         <button
           type="button"
           onClick={handleAddToCart}
-          className="w-full border border-black px-6 py-4 text-[18px] leading-none hover:underline cursor-pointer"
+          disabled={isSubmitting}
+          className="w-full border border-black px-5 py-3.5 text-[18px] leading-none hover:underline cursor-pointer disabled:opacity-60"
         >
-          Add to cart
+          {isSubmitting ? "Adding..." : "Add to cart"}
         </button>
+
+        {message ? (
+          <p className="mt-4 text-[16px] leading-none">{message}</p>
+        ) : null}
       </div>
     </div>
   );
