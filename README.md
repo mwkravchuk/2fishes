@@ -8,7 +8,7 @@ This project implements a full purchase flow from product browsing to checkout a
 
 ## Tech Stack
 
-- **Frontend:** Next.js, React, Tailwind CSS  
+- **Frontend:** Next.js + Tailwind CSS  
 - **Backend:** Next.js API routes / server actions  
 - **Database:** PostgreSQL (Neon)  
 - **ORM:** Prisma  
@@ -41,4 +41,4 @@ npm run dev
 ```
 
 Create a .env with the following variables:
-
+DATABASE_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, NEXT_PUBLIC_APP_URL
