@@ -41,4 +41,8 @@ npm run dev
 ```
 
 Create a .env with the following variables:
-
+DATABASE_URL=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+RESEND_API_KEY=
+NEXT_PUBLIC_APP_URL=
