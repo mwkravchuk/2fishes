@@ -31,7 +31,7 @@ model Product {
   flavorNotes String[]
 
   priceCents Int
-  imageUrl   String
+  imageKey   String // S3 key for the product image
   isActive   Boolean @default(true)
 
   availableGrinds GrindOption[] @default([whole_bean])
