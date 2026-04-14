@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import SiteShell from "@/components/SiteShell";
 import AddToCartForm from "@/components/AddToCartForm";
+import { getProductImageUrl } from "@/lib/product-images";
+
 
 type ProductDetailPageProps = {
   params: Promise<{
@@ -34,9 +36,9 @@ export default async function ProductDetailPage({
             {/* Left: image */}
             <div className="w-full md:w-[50%]">
               <div className="aspect-[5/5] overflow-hidden bg-[#d8d0c4]">
-                {product.imageUrl ? (
+                {product.imageKey ? (
                   <img
-                    src={product.imageUrl}
+                    src={getProductImageUrl(product.imageKey)}
                     alt={product.name}
                     className="h-full w-full object-cover"
                   />

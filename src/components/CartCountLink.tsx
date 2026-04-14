@@ -21,9 +21,14 @@ export default function CartCountLink() {
           cache: "no-store",
         });
 
+        if (!res.ok) {
+          console.error("Failed to load cart summary:", res.status);
+          return;
+        }
+
         const data = await res.json();
 
-        if (!res.ok || !data.ok) return;
+        if (!data.ok) return;
         if (!isMounted) return;
 
         setItemCount(data.itemCount);
@@ -46,5 +51,5 @@ export default function CartCountLink() {
     };
   }, []);
 
-  return <Link href="/cart">Cart ({itemCount})</Link>;
+  return <Link href="/cart" className="hover:underline">Cart ({itemCount})</Link>;
 }

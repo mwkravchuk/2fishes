@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { CART_COOKIE_NAME, getCartBySession } from "@/lib/cart";
+import { getProductImageUrl } from "@/lib/product-images";
+
 
 export async function POST() {
   try {
@@ -55,7 +57,7 @@ export async function POST() {
           unit_amount: item.unitPriceCents,
           product_data: {
             name: item.productNameSnap,
-            images: item.product.imageUrl ? [item.product.imageUrl] : [],
+            images: item.product.imageKey ? [getProductImageUrl(item.product.imageKey)] : [],
             metadata: {
               productId: item.productId,
               selectedSize: item.selectedSize,

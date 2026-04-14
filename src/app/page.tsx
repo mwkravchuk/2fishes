@@ -20,12 +20,22 @@ export default function HomePage() {
               <div className="mt-4 text-[22px] leading-[1.1] tabular-nums">
                 <RoastCountdown />
               </div>
+
+              <div className="mt-48 text-[18px] leading-[1.1] tabular-nums">
+                do not buy stuff! this website is a demo! (payments that go through stripe wont charge you but i get ur info so just dont :p)
+              </div>
             </div>
           </div>
 
           <div className="flex md:w-[52%] md:justify-start md:pt-8">
             <div className="w-full max-w-[620px]">
-              <div className="aspect-square bg-[#d8d0c4]" />
+              <div className="aspect-square bg-[#d8d0c4]">
+                <img
+                  src="/homepage.avif"
+                  alt="The shadow of two fishes, the owners of the coffee roasting company"
+                  className="h-full w-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>

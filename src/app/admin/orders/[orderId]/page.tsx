@@ -5,6 +5,7 @@ import SiteShell from "@/components/SiteShell";
 import { getStripePaymentDashboardUrl } from "@/lib/stripe-dashboard";
 import OrderFulfillmentForm from "@/components/admin/OrderFulfillmentForm";
 import StatusBadge from "@/components/admin/StatusBadge";
+import { getProductImageUrl } from "@/lib/product-images";
 
 type AdminOrderDetailPageProps = {
   params: Promise<{
@@ -25,7 +26,7 @@ export default async function AdminOrderDetailPage({
           product: {
             select: {
               slug: true,
-              imageUrl: true,
+              imageKey: true,
             },
           },
         },
@@ -82,16 +83,16 @@ export default async function AdminOrderDetailPage({
               <section>
                 <h2 className="text-[18px] leading-none">Items</h2>
 
-                <div className="mt-3 border-t border-black">
+                <div className="mt-3">
                   {order.items.map((item) => (
                     <div
                       key={item.id}
-                      className="grid grid-cols-[66px_1fr_auto] gap-5 border-b border-black py-5"
+                      className="grid grid-cols-[66px_1fr_auto] gap-5 border-t border-black py-5"
                     >
                       <div className="h-[66px] w-[66px] overflow-hidden bg-[#d8d0c4]">
-                        {item.product?.imageUrl ? (
+                        {item.product?.imageKey ? (
                           <img
-                            src={item.product.imageUrl}
+                            src={getProductImageUrl(item.product.imageKey)}
                             alt={item.productNameSnap}
                             className="h-full w-full object-cover"
                           />

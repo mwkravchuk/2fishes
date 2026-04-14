@@ -11,6 +11,7 @@ import {
   formatGrindOption,
   getCartBySession,
 } from "@/lib/cart";
+import { getProductImageUrl } from "@/lib/product-images";
 
 export default async function CartPage() {
   const cookieStore = await cookies();
@@ -40,9 +41,9 @@ export default async function CartPage() {
                     >
                       <div className="flex items-start gap-5">
                         <div className="h-[66px] w-[66px] shrink-0 overflow-hidden bg-[#d8d0c4]">
-                          {item.product.imageUrl ? (
+                          {item.product.imageKey ? (
                             <img
-                              src={item.product.imageUrl}
+                              src={getProductImageUrl(item.product.imageKey)}
                               alt={item.productNameSnap}
                               className="h-full w-full object-cover"
                             />

@@ -113,7 +113,7 @@ export async function getCartBySession(sessionId: string) {
         include: {
           product: {
             select: {
-              imageUrl: true,
+              imageKey: true,
               slug: true,
               isActive: true,
             },
