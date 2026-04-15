@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import RoastScheduleNotice from "@/components/RoastScheduleNotice";
 
 type OrderItem = {
   id: string;
@@ -96,34 +97,60 @@ export default function SuccessOrderStatus({
 
   if (!order) {
     return (
-      <div className="mx-auto max-w-[800px]">
-        <h1 className="text-[18px] leading-[0.92]">
-          Thank you for your order!
-        </h1>
+      <div className="mx-auto max-w-[1080px]">
+        <div className="grid gap-16 md:grid-cols-[minmax(0,1.15fr)_320px] md:items-start">
+          <div className="max-w-[640px]">
+            <h1 className="text-[18px] leading-[0.92]">
+              Thank you for your order!
+            </h1>
 
-        <p className="mt-8 text-[18px] leading-[1.15]">
-          Your payment was received and we’re processing your order now.
-        </p>
+            <p className="mt-10 text-[18px] leading-[1.15]">
+              Your payment was received and we’re processing your order now.
+            </p>
 
-        <p className="mt-4 text-[18px] leading-[1.2]">
-          {isPolling
-            ? "Finalizing your receipt..."
-            : "You’ll receive a confirmation email shortly."}
-        </p>
+            <p className="mt-4 text-[18px] leading-[1.2]">
+              {isPolling
+                ? "Finalizing your receipt..."
+                : "You’ll receive a confirmation email shortly."}
+            </p>
 
-        {timedOut ? (
-          <p className="mt-4 text-[18px] leading-[1.2]">
-            We’re still finalizing your order record. Your payment went through.
-          </p>
-        ) : null}
+            {timedOut ? (
+              <p className="mt-4 text-[18px] leading-[1.2]">
+                We’re still finalizing your order record. Your payment went
+                through.
+              </p>
+            ) : null}
 
-        <div className="mt-10">
-          <Link
-            href="/shop"
-            className="inline-block border border-black px-5 py-3.5 text-[18px] leading-none hover:underline"
-          >
-            Continue shopping
-          </Link>
+            <div className="mt-12">
+              <Link
+                href="/shop"
+                className="inline-block border border-black px-6 py-4 text-[18px] leading-none hover:underline"
+              >
+                Continue shopping
+              </Link>
+            </div>
+          </div>
+
+          <aside className="border border-black p-6">
+            <p className="text-[18px] leading-none">What happens next</p>
+
+            <div className="mt-8 space-y-6 text-[18px] leading-[1.2]">
+              <div>
+                <p>Confirmation email</p>
+                <p className="mt-1">Sent shortly after checkout.</p>
+              </div>
+
+              <div>
+                <p>Roasting</p>
+                <p className="mt-1">Orders are batch roasted on Saturday.</p>
+              </div>
+
+              <div>
+                <p>Shipping</p>
+                <p className="mt-1">Orders typically ship the following Monday.</p>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     );
@@ -131,53 +158,56 @@ export default function SuccessOrderStatus({
 
   return (
     <div className="mx-auto max-w-[900px]">
-      <h1 className="text-[18px] leading-[0.1.15]">Thank you for your order!</h1>
+      <div className="flex flex-col gap-9">
+        <h1 className="text-[18px] leading-[0.92]">Thank you for your order!</h1>
+        <div className="flex flex-col gap-3">
+          <RoastScheduleNotice variant="success"/>
+          <p className="text-[18px] leading-[1.15]">
+            A confirmation email has been sent to{" "}
+            <span className="font-bold">{order.customerEmail}</span>.
+          </p>
+        </div>
+      </div>
 
-      <p className="mt-2 text-[18px] leading-[1.15]">
-        Your order has been received and is being prepared.
-      </p>
-
-      <p className="mt-2 text-[18px] leading-[1.15]">
-        A confirmation email has been sent to <span className="font-bold">{order.customerEmail}</span>.
-      </p>
-
-      <div className="mt-24 grid gap-12 md:grid-cols-2">
-        <div>
+      <div className="mt-24 grid gap-16 md:grid-cols-2">
+        <section>
           <h2 className="text-[18px] leading-none">Order summary</h2>
 
-          <div className="mt-2 border-t border-black">
+          <div className="mt-4 border-t border-black">
             {order.items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-start justify-between gap-6 py-4"
+                className="flex items-start justify-between gap-6 py-5"
               >
-                <div>
+                <div className="min-w-0">
                   <p className="font-display text-[18px] leading-none">
                     {item.productNameSnap}
                   </p>
                   <p className="mt-2 text-[18px] leading-[1.2]">
-                    {formatBagSize(item.selectedSize)} /{" "}
+                    {formatBagSize(item.selectedSize)} •{" "}
                     {formatGrind(item.selectedGrind)}
                   </p>
                 </div>
 
-                <div className="text-[18px] leading-none">x{item.quantity}</div>
+                <div className="shrink-0 text-[18px] leading-none">
+                  ×{item.quantity}
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-12 flex items-center justify-between border-b border-black pb-4">
+          <div className="mt-10 flex items-center justify-between border-b border-black pb-4">
             <span className="text-[18px] leading-none">Total</span>
             <span className="text-[18px] leading-none">
               {formatPrice(order.totalCents)}
             </span>
           </div>
-        </div>
+        </section>
 
-        <div>
+        <section>
           <h2 className="text-[18px] leading-none">Shipping to</h2>
 
-          <div className="mt-6 space-y-1 text-[18px] leading-[1.2]">
+          <div className="mt-8 space-y-1 text-[18px] leading-[1.2]">
             {order.shippingName ? <p>{order.shippingName}</p> : null}
             {order.shippingLine1 ? <p>{order.shippingLine1}</p> : null}
             {order.shippingLine2 ? <p>{order.shippingLine2}</p> : null}
@@ -188,18 +218,13 @@ export default function SuccessOrderStatus({
             </p>
             {order.shippingCountry ? <p>{order.shippingCountry}</p> : null}
           </div>
-
-          <p className="mt-8 text-[18px] leading-[1.2]">
-            Orders are batch roasted on Saturday and typically ship out the
-            following Monday.
-          </p>
-        </div>
+        </section>
       </div>
 
-      <div className="mt-14">
+      <div className="mt-16">
         <Link
           href="/shop"
-          className="inline-block border border-black px-5 py-3.5 text-[18px] leading-none hover:underline"
+          className="inline-block border border-black px-6 py-4 text-[18px] leading-none hover:underline"
         >
           Continue shopping
         </Link>

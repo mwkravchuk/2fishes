@@ -1,5 +1,5 @@
-import RoastCountdown from "@/components/RoastCountdown";
 import SiteShell from "@/components/SiteShell";
+import RoastScheduleNotice from "@/components/RoastScheduleNotice";
 
 export default function HomePage() {
   return (
@@ -13,13 +13,11 @@ export default function HomePage() {
               </p>
 
               <div className="mt-4">
-                <p className="text-[26px] leading-[1.0]">coffee roasters</p>
-                <p className="text-[26px] leading-[1.0]">sacramento, ca</p>
+                <p className="text-[26px] leading-none">coffee roasters</p>
+                <p className="text-[26px] leading-none">sacramento, ca</p>
               </div>
 
-              <div className="mt-4 text-[22px] leading-[1.1] tabular-nums">
-                <RoastCountdown />
-              </div>
+              <RoastScheduleNotice variant="home" className="mt-8"/>
 
               <div className="mt-48 text-[18px] leading-[1.1] tabular-nums">
                 do not buy stuff! this website is a demo! (payments that go through stripe wont charge you but i get ur info so just dont :p)

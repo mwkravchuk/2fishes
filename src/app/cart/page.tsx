@@ -12,6 +12,7 @@ import {
   getCartBySession,
 } from "@/lib/cart";
 import { getProductImageUrl } from "@/lib/product-images";
+import RoastScheduleNotice from "@/components/RoastScheduleNotice";
 
 export default async function CartPage() {
   const cookieStore = await cookies();
@@ -28,6 +29,11 @@ export default async function CartPage() {
             <EmptyCart />
           ) : (
             <div>
+              <RoastScheduleNotice
+                variant="cart"
+                className="mb-16 max-w-[1080px]"
+              />
+
               <CartHeader />
 
               <div className="border-t border-black">
