@@ -8,17 +8,24 @@ import SiteShell from "@/components/SiteShell";
 export default function NewProductPage() {
   return (
     <SiteShell>
-      <main className="px-6 py-10">
-        <div className="mb-8">
-          <Link href="/admin/products" className="text-sm underline">
-            Back to products
-          </Link>
+      <main className="mt-10">
+        <div className="mx-auto max-w-[1080px]">
+          <div className="mb-8">
+            <Link href="/admin/products" className="hover:underline">
+              ← Back to products
+            </Link>
+          </div>
+
+          <div>
+            <ProductForm
+              action={createProduct}
+              submitLabel="Create Product"
+            />
+          </div>
         </div>
-
-        <h1 className="text-4xl mb-8">New Product</h1>
-
-        <ProductForm action={createProduct} submitLabel="Create Product" />
       </main>
+
+
     </SiteShell>
   );
 }

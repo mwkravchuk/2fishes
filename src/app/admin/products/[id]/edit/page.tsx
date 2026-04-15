@@ -29,7 +29,7 @@ export default async function EditProductPage({
 
   return (
     <SiteShell>
-      <main className="px-6 py-10">
+      <main className="my-10">
         <div className="mx-auto max-w-[1080px]">
           <div className="mb-8">
             <Link href="/admin/products" className="hover:underline">

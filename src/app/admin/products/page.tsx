@@ -11,7 +11,7 @@ export default async function AdminProductsPage() {
   return (
     <SiteShell>
       <div className="mt-24 mx-auto max-w-[1080px]">
-        <div className="grid grid-cols-2 gap-x-20 gap-y-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-20 gap-y-4 md:grid-cols-4">
           {products.map((product) => {
             const imageUrl = getProductImageUrl(product.imageKey);
 
