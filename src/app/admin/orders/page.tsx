@@ -18,82 +18,82 @@ export default async function AdminOrdersPage() {
       <section className="mt-16 pb-24">
         <div className="mx-auto max-w-[1080px]">
           <div className="mt-12">
-            <div className="grid grid-cols-[1.2fr_1.2fr_.8fr_.8fr_.8fr] gap-6 border-b border-black pb-4 text-[18px] leading-none">
+            <div className="grid grid-cols-[1.4fr_1.1fr_.8fr_.9fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none">
               <div>Order</div>
               <div>Customer</div>
               <div>Payment</div>
               <div>Fulfillment</div>
-              <div>Total</div>
-            </div>
-
-            <div>
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="grid grid-cols-[1.2fr_1.2fr_.8fr_.8fr_.8fr] gap-6 border-b border-black py-4"
-                >
-                  <div>
-                    <Link
-                      href={`/admin/orders/${order.id}`}
-                      className="text-[18px] leading-none hover:underline font-bold"
-                    >
-                      #{order.id}
-                    </Link>
-
-                    <p className="mt-2 text-[15px] leading-[1.2]">
-                      {formatDate(order.createdAt)}
-                    </p>
-
-                    <div className="mt-4 space-y-1 text-[15px] leading-[1.2]">
-                      {order.items.map((item) => (
-                        <p key={item.id}>
-                          {item.productNameSnap} × {item.quantity}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-[18px] leading-none">
-                      {order.customerEmail}
-                    </p>
-
-                    <div className="mt-3 space-y-1 text-[15px] leading-[1.2]">
-                      {order.shippingName ? <p>{order.shippingName}</p> : null}
-                      {order.shippingLine1 ? <p>{order.shippingLine1}</p> : null}
-                      {order.shippingLine2 ? <p>{order.shippingLine2}</p> : null}
-                      <p>
-                        {[
-                          order.shippingCity,
-                          order.shippingState,
-                          order.shippingZip,
-                        ]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <StatusBadge status={order.paymentStatus} />
-                  </div>
-
-                  <div>
-                    <StatusBadge status={order.fulfillmentStatus} />
-                  </div>
-
-                  <div className="text-[18px] leading-none">
-                    {formatPrice(order.totalCents)}
-                  </div>
-                </div>
-              ))}
+              <div className="text-right">Total</div>
             </div>
 
             {orders.length === 0 ? (
               <div className="border-b border-black py-8">
                 <p className="text-[18px] leading-[1.1]">No orders yet.</p>
               </div>
-            ) : null}
+            ) : (
+              <div>
+                {orders.map((order) => (
+                  <Link
+                    key={order.id}
+                    href={`/admin/orders/${order.id}`}
+                    className="block odd:bg-transparent even:bg-black/5 transition hover:bg-black/10"
+                  >
+                    <div className="grid grid-cols-[1.4fr_1.1fr_.8fr_.9fr_.7fr] gap-6 px-2 py-5 items-start">
+                      <div>
+                        <p className="text-[18px] leading-none">
+                          #{order.id}
+                        </p>
+
+                        <p className="mt-2 text-[15px] leading-[1.2] opacity-80">
+                          {formatDate(order.createdAt)}
+                        </p>
+
+                        <div className="mt-4 space-y-1 text-[15px] leading-[1.25]">
+                          {order.items.slice(0, 2).map((item) => (
+                            <p key={item.id}>
+                              {item.productNameSnap} × {item.quantity}
+                            </p>
+                          ))}
+
+                          {order.items.length > 2 ? (
+                            <p className="opacity-80">
+                              +{order.items.length - 2} more
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[18px] leading-none">
+                          {order.customerEmail}
+                        </p>
+
+                        <div className="mt-3 space-y-1 text-[15px] leading-[1.25] opacity-80">
+                          {order.shippingName ? <p>{order.shippingName}</p> : null}
+                          <p>
+                            {[order.shippingCity, order.shippingState]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="pt-[2px]">
+                        <StatusBadge status={order.paymentStatus} />
+                      </div>
+
+                      <div className="pt-[2px]">
+                        <StatusBadge status={order.fulfillmentStatus} />
+                      </div>
+
+                      <div className="text-right text-[18px] leading-none font-medium">
+                        {formatPrice(order.totalCents)}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -111,8 +111,4 @@ function formatDate(date: Date) {
     day: "numeric",
     year: "numeric",
   }).format(date);
-}
-
-function formatStatus(status: string) {
-  return status.replaceAll("_", " ");
 }

@@ -38,7 +38,7 @@ export default function OrderFulfillmentForm({
           id="fulfillmentStatus"
           name="fulfillmentStatus"
           defaultValue={fulfillmentStatus}
-          className="mt-1.5 w-full border border-black bg-transparent px-4 py-3 text-[18px] leading-none"
+          className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
         >
           <option value="pending">Pending</option>
           <option value="fulfilled">Fulfilled</option>
@@ -57,7 +57,7 @@ export default function OrderFulfillmentForm({
           name="trackingCarrier"
           defaultValue={trackingCarrier ?? ""}
           placeholder="USPS, UPS, etc."
-          className="mt-1.5 w-full border border-black bg-transparent px-4 py-3 text-[18px] leading-none"
+          className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
         />
       </div>
 
@@ -73,7 +73,7 @@ export default function OrderFulfillmentForm({
           name="trackingNumber"
           defaultValue={trackingNumber ?? ""}
           placeholder="Tracking number"
-          className="mt-1.5 w-full border border-black bg-transparent px-4 py-3 text-[18px] leading-none"
+          className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
         />
       </div>
 
