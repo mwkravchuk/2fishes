@@ -181,8 +181,14 @@ export default async function AdminOrderDetailPage({
                   <OrderFulfillmentForm
                     orderId={order.id}
                     fulfillmentStatus={order.fulfillmentStatus}
+                    paymentStatus={order.paymentStatus}
                     trackingCarrier={order.trackingCarrier}
                     trackingNumber={order.trackingNumber}
+                    shippingEmailSentAt={
+                      order.shippingEmailSentAt
+                        ? order.shippingEmailSentAt.toISOString()
+                        : null
+                    }
                   />
                 </div>
               </section>

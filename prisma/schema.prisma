@@ -53,10 +53,11 @@ model Order {
   shippingCents     Int
   totalCents        Int
 
-  stripeCheckoutSessionId String  @unique
-  stripePaymentIntentId   String? @unique
+  stripeCheckoutSessionId String    @unique
+  stripePaymentIntentId   String?   @unique
   trackingCarrier         String?
   trackingNumber          String?
+  shippingEmailSentAt     DateTime?
 
   shippingName    String?
   shippingLine1   String?

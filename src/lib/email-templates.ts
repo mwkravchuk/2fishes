@@ -160,7 +160,7 @@ ${itemsText}
   };
 }
 
-export function buildOrderFulfilledEmail(order: OrderEmailData & {
+export function buildOrderShippedEmail(order: OrderEmailData & {
   trackingCarrier?: string | null;
   trackingNumber?: string | null;
 }) {
