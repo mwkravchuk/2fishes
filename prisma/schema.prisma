@@ -21,6 +21,18 @@ enum BagSize {
   oz12
 }
 
+enum EmailJobType {
+  order_confirmation
+  internal_new_order
+}
+
+enum EmailJobStatus {
+  pending
+  processing
+  sent
+  failed
+}
+
 model Product {
   id   String @id @default(cuid())
   slug String @unique
@@ -71,7 +83,8 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items OrderItem[]
+  items     OrderItem[]
+  emailJobs EmailJob[]
 }
 
 model OrderItem {
@@ -117,4 +130,22 @@ model CartItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@unique([cartId, productId, selectedGrind, selectedSize])
+}
+
+model EmailJob {
+  id         String         @id @default(cuid())
+  orderId     String
+  type       EmailJobType
+  recipient  String
+  status     EmailJobStatus @default(pending)
+  attempts   Int            @default(0)
+  lastError  String?
+  sentAt     DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, type])
+  @@index([status, createdAt])
 }

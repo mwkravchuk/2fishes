@@ -3,18 +3,9 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { BagSize, GrindOption } from "@prisma/client";
 import { buildCartSnapshotKey } from "@/lib/cart";
+import { enqueueOrderEmailJobsTx, processOrderEmailJobs } from "@/lib/email-jobs";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import {
-  resend,
-  EMAIL_FROM,
-  EMAIL_REPLY_TO,
-  INTERNAL_ORDER_EMAIL,
-} from "@/lib/email";
-import {
-  buildCustomerOrderConfirmationEmail,
-  buildInternalNewOrderEmail,
-} from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -190,6 +181,11 @@ export async function POST(request: Request) {
           }
         });
 
+        await enqueueOrderEmailJobsTx(tx, {
+          orderId: order.id,
+          customerEmail: order.customerEmail,
+        });
+
         const currentCart = await tx.cart.findUnique({
           where: { id: cartId },
           include: {
@@ -223,57 +219,7 @@ export async function POST(request: Request) {
         return order;
       });
 
-      const emailData = {
-        orderId: createdOrder.id,
-        customerEmail: createdOrder.customerEmail,
-        shippingName: createdOrder.shippingName,
-        shippingLine1: createdOrder.shippingLine1,
-        shippingLine2: createdOrder.shippingLine2,
-        shippingCity: createdOrder.shippingCity,
-        shippingState: createdOrder.shippingState,
-        shippingZip: createdOrder.shippingZip,
-        shippingCountry: createdOrder.shippingCountry,
-        subtotalCents: createdOrder.subtotalCents,
-        shippingCents: createdOrder.shippingCents,
-        totalCents: createdOrder.totalCents,
-        items: createdOrder.items,
-      };
-
-      const customerEmailPayload =
-        buildCustomerOrderConfirmationEmail(emailData);
-      const internalEmailPayload = buildInternalNewOrderEmail(emailData);
-
-      const customerEmailResult = await resend.emails.send({
-        from: EMAIL_FROM,
-        to: [createdOrder.customerEmail],
-        replyTo: EMAIL_REPLY_TO,
-        subject: customerEmailPayload.subject,
-        html: customerEmailPayload.html,
-        text: customerEmailPayload.text,
-      });
-
-      if (customerEmailResult.error) {
-        console.error(
-          "Failed to send customer confirmation email",
-          customerEmailResult.error
-        );
-      }
-
-      const internalEmailResult = await resend.emails.send({
-        from: EMAIL_FROM,
-        to: [INTERNAL_ORDER_EMAIL],
-        replyTo: EMAIL_REPLY_TO,
-        subject: internalEmailPayload.subject,
-        html: internalEmailPayload.html,
-        text: internalEmailPayload.text,
-      });
-
-      if (internalEmailResult.error) {
-        console.error(
-          "Failed to send internal new-order email",
-          internalEmailResult.error
-        );
-      }
+      await processOrderEmailJobs(createdOrder.id);
     }
 
     return NextResponse.json({ received: true });

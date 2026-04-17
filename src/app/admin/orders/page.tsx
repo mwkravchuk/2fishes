@@ -9,6 +9,7 @@ export default async function AdminOrdersPage() {
       createdAt: "desc",
     },
     include: {
+      emailJobs: true,
       items: true,
     },
   });
@@ -18,10 +19,11 @@ export default async function AdminOrdersPage() {
       <section className="mt-16 pb-24">
         <div className="mx-auto max-w-[1080px]">
           <div className="mt-12">
-            <div className="grid grid-cols-[1.4fr_1.1fr_.8fr_.9fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none">
+            <div className="grid grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none">
               <div>Order</div>
               <div>Customer</div>
               <div>Payment</div>
+              <div>Email</div>
               <div>Fulfillment</div>
               <div className="text-right">Total</div>
             </div>
@@ -38,7 +40,7 @@ export default async function AdminOrdersPage() {
                     href={`/admin/orders/${order.id}`}
                     className="block odd:bg-transparent even:bg-black/5 transition hover:bg-black/10"
                   >
-                    <div className="grid grid-cols-[1.4fr_1.1fr_.8fr_.9fr_.7fr] gap-6 px-2 py-5 items-start">
+                    <div className="grid grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] gap-6 px-2 py-5 items-start">
                       <div>
                         <p className="text-[18px] leading-none">
                           #{order.id}
@@ -83,6 +85,10 @@ export default async function AdminOrdersPage() {
                       </div>
 
                       <div className="pt-[2px]">
+                        <StatusBadge status={getOrderEmailStatus(order.emailJobs)} />
+                      </div>
+
+                      <div className="pt-[2px]">
                         <StatusBadge status={order.fulfillmentStatus} />
                       </div>
 
@@ -111,4 +117,28 @@ function formatDate(date: Date) {
     day: "numeric",
     year: "numeric",
   }).format(date);
+}
+
+function getOrderEmailStatus(
+  jobs: {
+    status: string;
+  }[]
+) {
+  if (jobs.length === 0) {
+    return "not_queued";
+  }
+
+  if (jobs.some((job) => job.status === "failed")) {
+    return "email_failed";
+  }
+
+  if (jobs.every((job) => job.status === "sent")) {
+    return "email_sent";
+  }
+
+  if (jobs.some((job) => job.status === "processing")) {
+    return "email_processing";
+  }
+
+  return "email_pending";
 }

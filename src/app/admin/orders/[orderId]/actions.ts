@@ -2,12 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import {
-  resend,
-  EMAIL_FROM,
-  EMAIL_REPLY_TO,
-} from "@/lib/email";
-import { buildOrderShippedEmail } from "@/lib/email-templates";
+import { processEmailJob, sendShipmentEmailNow } from "@/lib/email-jobs";
 
 type ActionState = {
   error?: string;
@@ -111,36 +106,14 @@ export async function sendShipmentEmail(
     return { error: "Tracking number is required before sending email" };
   }
 
-  const emailPayload = buildOrderShippedEmail({
-    orderId: order.id,
-    customerEmail: order.customerEmail,
-    shippingName: order.shippingName,
-    shippingLine1: order.shippingLine1,
-    shippingLine2: order.shippingLine2,
-    shippingCity: order.shippingCity,
-    shippingState: order.shippingState,
-    shippingZip: order.shippingZip,
-    shippingCountry: order.shippingCountry,
-    subtotalCents: order.subtotalCents,
-    shippingCents: order.shippingCents,
-    totalCents: order.totalCents,
-    trackingCarrier: order.trackingCarrier,
-    trackingNumber: order.trackingNumber,
-    items: order.items,
-  });
-
-  const emailResult = await resend.emails.send({
-    from: EMAIL_FROM,
-    to: [order.customerEmail],
-    replyTo: EMAIL_REPLY_TO,
-    subject: emailPayload.subject,
-    html: emailPayload.html,
-    text: emailPayload.text,
-  });
-
-  if (emailResult.error) {
-    console.error("Failed to send shipment email", emailResult.error);
-    return { error: "Failed to send shipment email" };
+  try {
+    await sendShipmentEmailNow(order.id);
+  } catch (error) {
+    console.error("Failed to send shipment email", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to send shipment email",
+    };
   }
 
   await prisma.order.update({
@@ -149,6 +122,36 @@ export async function sendShipmentEmail(
       shippingEmailSentAt: new Date(),
     },
   });
+
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
+
+  return { success: true };
+}
+
+export async function retryOrderEmailJob(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const orderId = formData.get("orderId");
+  const emailJobId = formData.get("emailJobId");
+
+  if (typeof orderId !== "string" || !orderId) {
+    return { error: "Missing order ID" };
+  }
+
+  if (typeof emailJobId !== "string" || !emailJobId) {
+    return { error: "Missing email job ID" };
+  }
+
+  try {
+    await processEmailJob(emailJobId);
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Failed to retry email job",
+    };
+  }
 
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");

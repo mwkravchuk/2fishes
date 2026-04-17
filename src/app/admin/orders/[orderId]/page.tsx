@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import SiteShell from "@/components/SiteShell";
 import { getStripePaymentDashboardUrl } from "@/lib/stripe-dashboard";
 import OrderFulfillmentForm from "@/components/admin/OrderFulfillmentForm";
+import OrderEmailJobs from "@/components/admin/OrderEmailJobs";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { getProductImageUrl } from "@/lib/product-images";
 
@@ -21,6 +22,11 @@ export default async function AdminOrderDetailPage({
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
+      emailJobs: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
       items: {
         include: {
           product: {
@@ -191,6 +197,21 @@ export default async function AdminOrderDetailPage({
                     }
                   />
                 </div>
+              </section>
+
+              <section>
+                <OrderEmailJobs
+                  orderId={order.id}
+                  jobs={order.emailJobs.map((job) => ({
+                    id: job.id,
+                    type: job.type,
+                    recipient: job.recipient,
+                    status: job.status,
+                    attempts: job.attempts,
+                    sentAt: job.sentAt ? job.sentAt.toISOString() : null,
+                    lastError: job.lastError,
+                  }))}
+                />
               </section>
 
               <section>
