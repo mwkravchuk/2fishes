@@ -46,6 +46,7 @@ model Product {
 
 model Order {
   id                String @id @default(cuid())
+  sourceCartId      String?
   customerEmail     String
   paymentStatus     String
   fulfillmentStatus String
@@ -89,11 +90,14 @@ model OrderItem {
 }
 
 model Cart {
-  id         String   @id @default(cuid())
-  sessionId  String   @unique
-  totalCents Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                          String    @id @default(cuid())
+  sessionId                   String    @unique
+  totalCents                  Int
+  stripeCheckoutSessionId     String?   @unique
+  stripeCheckoutSessionUrl    String?
+  stripeCheckoutSessionExpire DateTime?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
 
   items CartItem[]
 }

@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { stripe } from "@/lib/stripe";
-import { CART_COOKIE_NAME, getCartBySession } from "@/lib/cart";
+import {
+  buildCartSnapshotKey,
+  CART_COOKIE_NAME,
+  getCartBySession,
+} from "@/lib/cart";
 import { getProductImageUrl } from "@/lib/product-images";
+import { prisma } from "@/lib/prisma";
 
 
 export async function POST() {
@@ -31,6 +36,60 @@ export async function POST() {
       throw new Error("Missing NEXT_PUBLIC_APP_URL");
     }
 
+    const snapshotKey = buildCartSnapshotKey({
+      items: cart.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPriceCents: item.unitPriceCents,
+        selectedSize: item.selectedSize,
+        selectedGrind: item.selectedGrind,
+      })),
+      totalCents: cart.totalCents,
+    });
+
+    if (cart.stripeCheckoutSessionId) {
+      const existingSession = await stripe.checkout.sessions.retrieve(
+        cart.stripeCheckoutSessionId
+      );
+
+      const matchesCurrentSnapshot =
+        existingSession.metadata?.snapshotKey === snapshotKey;
+
+      if (
+        matchesCurrentSnapshot &&
+        existingSession.status === "open" &&
+        existingSession.url
+      ) {
+        return NextResponse.json({
+          ok: true,
+          url: existingSession.url,
+        });
+      }
+
+      if (
+        matchesCurrentSnapshot &&
+        (
+          existingSession.status === "complete" ||
+          existingSession.payment_status === "paid"
+        )
+      ) {
+        const existingOrder = await prisma.order.findUnique({
+          where: { stripeCheckoutSessionId: existingSession.id },
+          select: {
+            stripeCheckoutSessionId: true,
+          },
+        });
+
+        const completedSessionId =
+          existingOrder?.stripeCheckoutSessionId ?? existingSession.id;
+
+        return NextResponse.json({
+          ok: true,
+          url: `${baseUrl}/checkout/success?session_id=${encodeURIComponent(completedSessionId)}`,
+        });
+      }
+    }
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -49,6 +108,8 @@ export async function POST() {
       ],
       metadata: {
         cartId: cart.id,
+        cartSessionId: cart.sessionId,
+        snapshotKey,
       },
       line_items: cart.items.map((item) => ({
         quantity: item.quantity,
@@ -66,6 +127,20 @@ export async function POST() {
           },
         },
       })),
+    }, {
+      idempotencyKey: `checkout_cart_${cart.id}_${cart.updatedAt.getTime()}`,
+    });
+
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        stripeCheckoutSessionId: checkoutSession.id,
+        stripeCheckoutSessionUrl: checkoutSession.url,
+        stripeCheckoutSessionExpire:
+          typeof checkoutSession.expires_at === "number"
+            ? new Date(checkoutSession.expires_at * 1000)
+            : null,
+      },
     });
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
-import { BagSize, GrindOption } from "@prisma/client";
+import { BagSize, GrindOption, Prisma } from "@prisma/client";
 
 export const CART_COOKIE_NAME = "cartSessionId";
 
@@ -192,7 +192,10 @@ export async function removeCartItem(input: {
   });
 }
 
-async function recalculateCartTotalTx(tx: any, cartId: string) {
+async function recalculateCartTotalTx(
+  tx: Prisma.TransactionClient,
+  cartId: string
+) {
   const items = await tx.cartItem.findMany({
     where: { cartId },
     select: {
@@ -212,6 +215,38 @@ async function recalculateCartTotalTx(tx: any, cartId: string) {
     include: {
       items: true,
     },
+  });
+}
+
+type CartSnapshotItem = {
+  productId: string;
+  quantity: number;
+  unitPriceCents: number;
+  selectedSize: BagSize;
+  selectedGrind: GrindOption;
+};
+
+export function buildCartSnapshotKey(input: {
+  items: CartSnapshotItem[];
+  totalCents: number;
+}) {
+  const normalizedItems = [...input.items]
+    .map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      unitPriceCents: item.unitPriceCents,
+      selectedSize: item.selectedSize,
+      selectedGrind: item.selectedGrind,
+    }))
+    .sort((a, b) => {
+      return `${a.productId}:${a.selectedSize}:${a.selectedGrind}`.localeCompare(
+        `${b.productId}:${b.selectedSize}:${b.selectedGrind}`
+      );
+    });
+
+  return JSON.stringify({
+    totalCents: input.totalCents,
+    items: normalizedItems,
   });
 }
 

@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { BagSize, GrindOption } from "@prisma/client";
+import { buildCartSnapshotKey } from "@/lib/cart";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import {
@@ -57,17 +59,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ received: true });
       }
 
-      const cart = await prisma.cart.findUnique({
-        where: { id: cartId },
-        include: {
-          items: true,
-        },
-      });
-
-      if (!cart || cart.items.length === 0) {
-        throw new Error("Cart not found or empty");
-      }
-
       const customerDetails = session.customer_details;
       const address = session.collected_information?.shipping_details?.address;
 
@@ -83,18 +74,80 @@ export async function POST(request: Request) {
         throw new Error("Missing session amount_total");
       }
 
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+        limit: 100,
+        expand: ["data.price.product"],
+      });
+
+      if (lineItems.data.length === 0) {
+        throw new Error("Checkout session had no line items");
+      }
+
+      const normalizedItems = lineItems.data.map((item) => {
+        const quantity = item.quantity;
+        const unitPriceCents = item.price?.unit_amount;
+        const stripeProduct = item.price?.product;
+
+        if (!quantity || quantity < 1) {
+          throw new Error(`Invalid quantity for line item ${item.id}`);
+        }
+
+        if (typeof unitPriceCents !== "number") {
+          throw new Error(`Missing unit amount for line item ${item.id}`);
+        }
+
+        if (!stripeProduct || typeof stripeProduct === "string") {
+          throw new Error(`Missing expanded product for line item ${item.id}`);
+        }
+
+        const productId = stripeProduct.metadata.productId;
+        const selectedSize = stripeProduct.metadata.selectedSize;
+        const selectedGrind = stripeProduct.metadata.selectedGrind;
+
+        if (!productId) {
+          throw new Error(`Missing productId metadata for line item ${item.id}`);
+        }
+
+        if (!isBagSize(selectedSize)) {
+          throw new Error(`Invalid selectedSize metadata for line item ${item.id}`);
+        }
+
+        if (!isGrindOption(selectedGrind)) {
+          throw new Error(`Invalid selectedGrind metadata for line item ${item.id}`);
+        }
+
+        return {
+          productId,
+          productNameSnap: item.description ?? stripeProduct.name,
+          unitPriceCents,
+          quantity,
+          selectedSize,
+          selectedGrind,
+        };
+      });
+
       const totalCents = session.amount_total;
 
       const subtotalCents =
         typeof session.amount_subtotal === "number"
           ? session.amount_subtotal
-          : cart.totalCents;
+          : normalizedItems.reduce(
+              (sum, item) => sum + item.unitPriceCents * item.quantity,
+              0
+            );
 
       const shippingCents = totalCents - subtotalCents;
 
       if (shippingCents < 0) {
         throw new Error("Computed shipping amount was negative");
       }
+
+      const paidSnapshotKey =
+        session.metadata?.snapshotKey ??
+        buildCartSnapshotKey({
+          items: normalizedItems,
+          totalCents: subtotalCents,
+        });
 
       const createdOrder = await prisma.$transaction(async (tx) => {
         const order = await tx.order.create({
@@ -108,6 +161,7 @@ export async function POST(request: Request) {
             shippingZip: address.postal_code ?? "",
             shippingCountry: address.country ?? "",
 
+            sourceCartId: cartId,
             paymentStatus: "paid",
             fulfillmentStatus: "pending",
 
@@ -121,7 +175,7 @@ export async function POST(request: Request) {
                 : null,
 
             items: {
-              create: cart.items.map((item) => ({
+              create: normalizedItems.map((item) => ({
                 productId: item.productId,
                 productNameSnap: item.productNameSnap,
                 unitPriceCents: item.unitPriceCents,
@@ -136,13 +190,35 @@ export async function POST(request: Request) {
           }
         });
 
-        await tx.cartItem.deleteMany({
-          where: { cartId: cart.id },
+        const currentCart = await tx.cart.findUnique({
+          where: { id: cartId },
+          include: {
+            items: true,
+          },
         });
 
-        await tx.cart.delete({
-          where: { id: cart.id },
-        });
+        if (currentCart) {
+          const currentCartSnapshotKey = buildCartSnapshotKey({
+            items: currentCart.items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPriceCents: item.unitPriceCents,
+              selectedSize: item.selectedSize,
+              selectedGrind: item.selectedGrind,
+            })),
+            totalCents: currentCart.totalCents,
+          });
+
+          if (currentCartSnapshotKey === paidSnapshotKey) {
+            await tx.cartItem.deleteMany({
+              where: { cartId },
+            });
+
+            await tx.cart.delete({
+              where: { id: cartId },
+            });
+          }
+        }
 
         return order;
       });
@@ -205,4 +281,12 @@ export async function POST(request: Request) {
     console.error("Webhook handling failed", error);
     return new NextResponse("Webhook handler failed", { status: 500 });
   }
+}
+
+function isBagSize(value: string | undefined): value is BagSize {
+  return value === "oz12";
+}
+
+function isGrindOption(value: string | undefined): value is GrindOption {
+  return value === "whole_bean";
 }
