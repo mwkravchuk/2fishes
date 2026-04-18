@@ -6,6 +6,7 @@ import {
   CART_COOKIE_NAME,
   getCartBySession,
 } from "@/lib/cart";
+import { logError, logInfo } from "@/lib/logging";
 import { getProductImageUrl } from "@/lib/product-images";
 import { prisma } from "@/lib/prisma";
 
@@ -60,6 +61,11 @@ export async function POST() {
         existingSession.status === "open" &&
         existingSession.url
       ) {
+        logInfo("checkout_session_reused", {
+          cartId: cart.id,
+          checkoutSessionId: existingSession.id,
+        });
+
         return NextResponse.json({
           ok: true,
           url: existingSession.url,
@@ -82,6 +88,12 @@ export async function POST() {
 
         const completedSessionId =
           existingOrder?.stripeCheckoutSessionId ?? existingSession.id;
+
+        logInfo("checkout_session_already_completed", {
+          cartId: cart.id,
+          checkoutSessionId: existingSession.id,
+          orderFound: Boolean(existingOrder),
+        });
 
         return NextResponse.json({
           ok: true,
@@ -143,12 +155,24 @@ export async function POST() {
       },
     });
 
+    logInfo("checkout_session_created", {
+      cartId: cart.id,
+      checkoutSessionId: checkoutSession.id,
+      itemCount: cart.items.length,
+      totalCents: cart.totalCents,
+    });
+
     return NextResponse.json({
       ok: true,
       url: checkoutSession.url,
     });
   } catch (error) {
-    console.error("Failed to create checkout session", error);
+    logError("checkout_session_create_failed", {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create checkout session",
+    });
 
     return NextResponse.json(
       {

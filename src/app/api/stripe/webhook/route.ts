@@ -1,9 +1,8 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { BagSize, GrindOption } from "@prisma/client";
-import { buildCartSnapshotKey } from "@/lib/cart";
-import { enqueueOrderEmailJobsTx, processOrderEmailJobs } from "@/lib/email-jobs";
+import { logError, logInfo } from "@/lib/logging";
+import { createOrderFromCheckoutSession } from "@/lib/orders-from-stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
@@ -42,197 +41,33 @@ export async function POST(request: Request) {
         throw new Error("Missing cart reference on checkout session");
       }
 
+      logInfo("checkout_webhook_received", {
+        checkoutSessionId: session.id,
+        cartId,
+        paymentStatus: session.payment_status,
+      });
+
       const existingOrder = await prisma.order.findUnique({
         where: { stripeCheckoutSessionId: session.id },
       });
 
       if (existingOrder) {
+        logInfo("checkout_webhook_duplicate_ignored", {
+          checkoutSessionId: session.id,
+          orderId: existingOrder.id,
+        });
+
         return NextResponse.json({ received: true });
       }
-
-      const customerDetails = session.customer_details;
-      const address = session.collected_information?.shipping_details?.address;
-
-      if (!customerDetails?.email) {
-        throw new Error("Missing customer email on checkout session");
-      }
-
-      if (!address) {
-        throw new Error("Missing shipping address on checkout session");
-      }
-
-      if (typeof session.amount_total !== "number") {
-        throw new Error("Missing session amount_total");
-      }
-
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-        limit: 100,
-        expand: ["data.price.product"],
-      });
-
-      if (lineItems.data.length === 0) {
-        throw new Error("Checkout session had no line items");
-      }
-
-      const normalizedItems = lineItems.data.map((item) => {
-        const quantity = item.quantity;
-        const unitPriceCents = item.price?.unit_amount;
-        const stripeProduct = item.price?.product;
-
-        if (!quantity || quantity < 1) {
-          throw new Error(`Invalid quantity for line item ${item.id}`);
-        }
-
-        if (typeof unitPriceCents !== "number") {
-          throw new Error(`Missing unit amount for line item ${item.id}`);
-        }
-
-        if (!stripeProduct || typeof stripeProduct === "string") {
-          throw new Error(`Missing expanded product for line item ${item.id}`);
-        }
-
-        const productId = stripeProduct.metadata.productId;
-        const selectedSize = stripeProduct.metadata.selectedSize;
-        const selectedGrind = stripeProduct.metadata.selectedGrind;
-
-        if (!productId) {
-          throw new Error(`Missing productId metadata for line item ${item.id}`);
-        }
-
-        if (!isBagSize(selectedSize)) {
-          throw new Error(`Invalid selectedSize metadata for line item ${item.id}`);
-        }
-
-        if (!isGrindOption(selectedGrind)) {
-          throw new Error(`Invalid selectedGrind metadata for line item ${item.id}`);
-        }
-
-        return {
-          productId,
-          productNameSnap: item.description ?? stripeProduct.name,
-          unitPriceCents,
-          quantity,
-          selectedSize,
-          selectedGrind,
-        };
-      });
-
-      const totalCents = session.amount_total;
-
-      const subtotalCents =
-        typeof session.amount_subtotal === "number"
-          ? session.amount_subtotal
-          : normalizedItems.reduce(
-              (sum, item) => sum + item.unitPriceCents * item.quantity,
-              0
-            );
-
-      const shippingCents = totalCents - subtotalCents;
-
-      if (shippingCents < 0) {
-        throw new Error("Computed shipping amount was negative");
-      }
-
-      const paidSnapshotKey =
-        session.metadata?.snapshotKey ??
-        buildCartSnapshotKey({
-          items: normalizedItems,
-          totalCents: subtotalCents,
-        });
-
-      const createdOrder = await prisma.$transaction(async (tx) => {
-        const order = await tx.order.create({
-          data: {
-            customerEmail: customerDetails.email ?? "",
-            shippingName: customerDetails.name ?? "",
-            shippingLine1: address.line1 ?? "",
-            shippingLine2: address.line2 ?? "",
-            shippingCity: address.city ?? "",
-            shippingState: address.state ?? "",
-            shippingZip: address.postal_code ?? "",
-            shippingCountry: address.country ?? "",
-
-            sourceCartId: cartId,
-            paymentStatus: "paid",
-            fulfillmentStatus: "pending",
-
-            subtotalCents,
-            shippingCents,
-            totalCents,
-            stripeCheckoutSessionId: session.id,
-            stripePaymentIntentId:
-              typeof session.payment_intent === "string"
-                ? session.payment_intent
-                : null,
-
-            items: {
-              create: normalizedItems.map((item) => ({
-                productId: item.productId,
-                productNameSnap: item.productNameSnap,
-                unitPriceCents: item.unitPriceCents,
-                quantity: item.quantity,
-                selectedGrind: item.selectedGrind,
-                selectedSize: item.selectedSize,
-              })),
-            },
-          },
-          include: {
-            items: true,
-          }
-        });
-
-        await enqueueOrderEmailJobsTx(tx, {
-          orderId: order.id,
-          customerEmail: order.customerEmail,
-        });
-
-        const currentCart = await tx.cart.findUnique({
-          where: { id: cartId },
-          include: {
-            items: true,
-          },
-        });
-
-        if (currentCart) {
-          const currentCartSnapshotKey = buildCartSnapshotKey({
-            items: currentCart.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              unitPriceCents: item.unitPriceCents,
-              selectedSize: item.selectedSize,
-              selectedGrind: item.selectedGrind,
-            })),
-            totalCents: currentCart.totalCents,
-          });
-
-          if (currentCartSnapshotKey === paidSnapshotKey) {
-            await tx.cartItem.deleteMany({
-              where: { cartId },
-            });
-
-            await tx.cart.delete({
-              where: { id: cartId },
-            });
-          }
-        }
-
-        return order;
-      });
-
-      await processOrderEmailJobs(createdOrder.id);
+      await createOrderFromCheckoutSession(session.id, "webhook");
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Webhook handling failed", error);
+    logError("checkout_webhook_failed", {
+      eventType: event.type,
+      error: error instanceof Error ? error.message : "Webhook handler failed",
+    });
     return new NextResponse("Webhook handler failed", { status: 500 });
   }
-}
-
-function isBagSize(value: string | undefined): value is BagSize {
-  return value === "oz12";
-}
-
-function isGrindOption(value: string | undefined): value is GrindOption {
-  return value === "whole_bean";
 }

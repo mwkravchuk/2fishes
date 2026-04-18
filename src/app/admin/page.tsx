@@ -56,11 +56,17 @@ function getBagSizeOz(size: string | null | undefined) {
 export default async function AdminPage() {
   const { start, end } = getCurrentBatchWindow();
 
-  const [productCount, pendingOrdersCount, batchOrders] = await Promise.all([
+  const [productCount, pendingOrdersCount, failedEmailJobsCount, batchOrders] =
+    await Promise.all([
     prisma.product.count(),
     prisma.order.count({
       where: {
         fulfillmentStatus: "pending",
+      },
+    }),
+    prisma.emailJob.count({
+      where: {
+        status: "failed",
       },
     }),
     prisma.order.findMany({
@@ -115,7 +121,7 @@ export default async function AdminPage() {
     <SiteShell>
       <section className="pb-24">
         <div className="mx-auto max-w-[1080px]">
-          <div className="mt-30 grid gap-8 md:grid-cols-2">
+          <div className="mt-30 grid gap-8 md:grid-cols-3">
             <Link
               href="/admin/products"
               className="block border border-black p-8 transition hover:bg-black/5"
@@ -145,6 +151,23 @@ export default async function AdminPage() {
                   </div>
                   <p className="mt-4 text-[18px] leading-[1.2] opacity-80">
                     Review purchases, update fulfillment, and track status.
+                  </p>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/admin/ops"
+              className="block border border-black p-8 transition hover:bg-black/5"
+            >
+              <div className="flex items-start justify-between gap-6">
+                <div>
+                  <div className="flex gap-2">
+                    <h2 className="text-[24px] leading-none">Ops</h2>
+                    <p>({failedEmailJobsCount} alerts)</p>
+                  </div>
+                  <p className="mt-4 text-[18px] leading-[1.2] opacity-80">
+                    Review failed email jobs and low-frequency operational issues.
                   </p>
                 </div>
               </div>

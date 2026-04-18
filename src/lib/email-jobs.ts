@@ -4,6 +4,7 @@ import {
   buildInternalNewOrderEmail,
   buildOrderShippedEmail,
 } from "@/lib/email-templates";
+import { logError, logInfo, logWarn } from "@/lib/logging";
 import {
   EMAIL_FROM,
   EMAIL_REPLY_TO,
@@ -72,6 +73,11 @@ export async function enqueueOrderEmailJobsTx(tx: typeof prisma, input: {
       },
     ],
   });
+
+  logInfo("order_email_jobs_queued", {
+    orderId: input.orderId,
+    jobCount: 2,
+  });
 }
 
 export async function processOrderEmailJobs(orderId: string) {
@@ -113,6 +119,10 @@ export async function processEmailJob(jobId: string) {
   }
 
   if (!hasEmailConfig()) {
+    logWarn("email_job_config_missing", {
+      emailJobId: job.id,
+      orderId: job.orderId,
+    });
     await markEmailJobFailed(job.id, job.attempts + 1, "Missing RESEND_API_KEY");
     return;
   }
@@ -120,6 +130,10 @@ export async function processEmailJob(jobId: string) {
   const resend = getResendClient();
 
   if (!resend) {
+    logError("email_job_client_unavailable", {
+      emailJobId: job.id,
+      orderId: job.orderId,
+    });
     await markEmailJobFailed(job.id, job.attempts + 1, "Resend client unavailable");
     return;
   }
@@ -137,6 +151,10 @@ export async function processEmailJob(jobId: string) {
 
   try {
     const emailData = buildOrderEmailData(job.order);
+    const recipient =
+      job.type === "order_confirmation"
+        ? job.order.customerEmail
+        : INTERNAL_ORDER_EMAIL;
 
     const payload =
       job.type === "order_confirmation"
@@ -145,7 +163,7 @@ export async function processEmailJob(jobId: string) {
 
     const result = await resend.emails.send({
       from: EMAIL_FROM,
-      to: [job.recipient],
+      to: [recipient],
       replyTo: EMAIL_REPLY_TO,
       subject: payload.subject,
       html: payload.html,
@@ -160,11 +178,27 @@ export async function processEmailJob(jobId: string) {
       where: { id: job.id },
       data: {
         status: "sent",
+        recipient,
         sentAt: new Date(),
         lastError: null,
       },
     });
+
+    logInfo("email_job_sent", {
+      emailJobId: job.id,
+      orderId: job.orderId,
+      type: job.type,
+      attempts: job.attempts + 1,
+    });
   } catch (error) {
+    logError("email_job_failed", {
+      emailJobId: job.id,
+      orderId: job.orderId,
+      type: job.type,
+      error: error instanceof Error ? error.message : "Failed to send email",
+      attempts: job.attempts + 1,
+    });
+
     await markEmailJobFailed(
       job.id,
       job.attempts + 1,
@@ -221,4 +255,8 @@ export async function sendShipmentEmailNow(orderId: string) {
   if (result.error) {
     throw new Error(result.error.message || "Failed to send shipment email");
   }
+
+  logInfo("shipment_email_sent", {
+    orderId: order.id,
+  });
 }
