@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import SiteShell from "@/components/site/SiteShell";
 import { redirect } from "next/navigation";
 
 function getAdminEmails() {
@@ -26,5 +27,5 @@ export default async function AdminLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return <SiteShell>{children}</SiteShell>;
 }

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import SiteHeader from "@/components/SiteHeader";
+import SiteHeader from "@/components/site/SiteHeader";
 
 type SiteShellProps = {
   children: ReactNode;

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { logError, logInfo } from "@/lib/logging";
-import { createOrderFromCheckoutSession } from "@/lib/orders-from-stripe";
+import { createOrderFromCheckoutSession } from "@/features/checkout/server/orders-from-stripe";
 
 type ActionState = {
   error?: string;

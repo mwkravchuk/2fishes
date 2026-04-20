@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logging";
-import { createOrderFromCheckoutSession } from "@/lib/orders-from-stripe";
+import { createOrderFromCheckoutSession } from "@/features/checkout/server/orders-from-stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 

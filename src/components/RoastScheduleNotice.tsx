@@ -71,19 +71,15 @@ export default function RoastScheduleNotice({
   variant = "cart",
   className = "",
 }: RoastScheduleNoticeProps) {
-  const [now, setNow] = useState<Date | null>(null);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    setNow(new Date());
-
     const interval = window.setInterval(() => {
       setNow(new Date());
     }, 1000);
 
     return () => window.clearInterval(interval);
   }, []);
-
-  if (!now) return null;
 
   const { roastDate, shipDate, cutoffDate } = getRoastSchedule(now);
   const diff = cutoffDate.getTime() - now.getTime();

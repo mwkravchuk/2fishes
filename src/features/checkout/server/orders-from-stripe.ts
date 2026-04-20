@@ -1,6 +1,9 @@
 import { BagSize, GrindOption } from "@prisma/client";
 import { buildCartSnapshotKey } from "@/lib/cart";
-import { enqueueOrderEmailJobsTx, processOrderEmailJobs } from "@/lib/email-jobs";
+import {
+  enqueueOrderEmailJobsTx,
+  processOrderEmailJobs,
+} from "@/features/checkout/server/email-jobs";
 import { logError, logInfo } from "@/lib/logging";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";

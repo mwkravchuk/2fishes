@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { processEmailJob, sendShipmentEmailNow } from "@/lib/email-jobs";
+import {
+  processEmailJob,
+  sendShipmentEmailNow,
+} from "@/features/checkout/server/email-jobs";
 
 type ActionState = {
   error?: string;
