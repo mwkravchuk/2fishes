@@ -33,6 +33,11 @@ enum EmailJobStatus {
   failed
 }
 
+enum CheckoutRecoveryIssueStatus {
+  open
+  resolved
+}
+
 model Product {
   id   String @id @default(cuid())
   slug String @unique
@@ -147,5 +152,22 @@ model EmailJob {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@unique([orderId, type])
+  @@index([status, createdAt])
+}
+
+model CheckoutRecoveryIssue {
+  id                    String                      @id @default(cuid())
+  checkoutSessionId     String                      @unique
+  stripePaymentIntentId String?
+  cartId                String?
+  eventType             String
+  lastError             String
+  status                CheckoutRecoveryIssueStatus @default(open)
+  recoveredOrderId      String?
+  resolutionSource      String?
+  resolvedAt            DateTime?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+
   @@index([status, createdAt])
 }

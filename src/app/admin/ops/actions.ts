@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { logError, logInfo } from "@/lib/logging";
-import { createOrderFromCheckoutSession } from "@/features/checkout/server/orders-from-stripe";
+import {
+  createOrderFromCheckoutSession,
+  resolveCheckoutSessionId,
+} from "@/features/checkout/server/orders-from-stripe";
+import { prisma } from "@/lib/prisma";
 
 type ActionState = {
   error?: string;
@@ -22,10 +26,26 @@ export async function recoverOrderFromStripeSession(
   }
 
   try {
+    const normalizedCheckoutSessionId = await resolveCheckoutSessionId(
+      checkoutSessionId.trim()
+    );
     const result = await createOrderFromCheckoutSession(
-      checkoutSessionId.trim(),
+      normalizedCheckoutSessionId,
       "admin_recovery"
     );
+
+    await prisma.checkoutRecoveryIssue.updateMany({
+      where: {
+        checkoutSessionId: normalizedCheckoutSessionId,
+        status: "open",
+      },
+      data: {
+        status: "resolved",
+        recoveredOrderId: result.orderId,
+        resolutionSource: "admin_recovery",
+        resolvedAt: new Date(),
+      },
+    });
 
     revalidatePath("/admin");
     revalidatePath("/admin/ops");
@@ -33,7 +53,7 @@ export async function recoverOrderFromStripeSession(
 
     if (result.kind === "existing") {
       logInfo("admin_order_recovery_existing_order", {
-        checkoutSessionId: checkoutSessionId.trim(),
+        checkoutSessionId: normalizedCheckoutSessionId,
         orderId: result.orderId,
       });
 
@@ -47,7 +67,7 @@ export async function recoverOrderFromStripeSession(
     revalidatePath(`/admin/orders/${result.orderId}`);
 
     logInfo("admin_order_recovery_created_order", {
-      checkoutSessionId: checkoutSessionId.trim(),
+      checkoutSessionId: normalizedCheckoutSessionId,
       orderId: result.orderId,
     });
 

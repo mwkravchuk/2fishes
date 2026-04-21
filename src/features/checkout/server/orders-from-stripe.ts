@@ -203,7 +203,7 @@ export async function createOrderFromCheckoutSession(
   return { kind: "created" as const, orderId: order.id };
 }
 
-async function resolveCheckoutSessionId(reference: string) {
+export async function resolveCheckoutSessionId(reference: string) {
   if (reference.startsWith("cs_")) {
     return reference;
   }

@@ -52,6 +52,12 @@ export async function POST(request: Request) {
       });
 
       if (existingOrder) {
+        await resolveCheckoutRecoveryIssue({
+          checkoutSessionId: session.id,
+          orderId: existingOrder.id,
+          resolutionSource: "webhook_duplicate",
+        });
+
         logInfo("checkout_webhook_duplicate_ignored", {
           checkoutSessionId: session.id,
           orderId: existingOrder.id,
@@ -59,15 +65,74 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ received: true });
       }
-      await createOrderFromCheckoutSession(session.id, "webhook");
+      const result = await createOrderFromCheckoutSession(session.id, "webhook");
+
+      await resolveCheckoutRecoveryIssue({
+        checkoutSessionId: session.id,
+        orderId: result.orderId,
+        resolutionSource: "webhook",
+      });
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const cartId = session.client_reference_id ?? session.metadata?.cartId;
+
+      await prisma.checkoutRecoveryIssue.upsert({
+        where: { checkoutSessionId: session.id },
+        update: {
+          stripePaymentIntentId:
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : null,
+          cartId: typeof cartId === "string" ? cartId : null,
+          eventType: event.type,
+          lastError:
+            error instanceof Error ? error.message : "Webhook handler failed",
+          status: "open",
+          recoveredOrderId: null,
+          resolutionSource: null,
+          resolvedAt: null,
+        },
+        create: {
+          checkoutSessionId: session.id,
+          stripePaymentIntentId:
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : null,
+          cartId: typeof cartId === "string" ? cartId : null,
+          eventType: event.type,
+          lastError:
+            error instanceof Error ? error.message : "Webhook handler failed",
+        },
+      });
+    }
+
     logError("checkout_webhook_failed", {
       eventType: event.type,
       error: error instanceof Error ? error.message : "Webhook handler failed",
     });
     return new NextResponse("Webhook handler failed", { status: 500 });
   }
+}
+
+async function resolveCheckoutRecoveryIssue(input: {
+  checkoutSessionId: string;
+  orderId: string;
+  resolutionSource: string;
+}) {
+  await prisma.checkoutRecoveryIssue.updateMany({
+    where: {
+      checkoutSessionId: input.checkoutSessionId,
+      status: "open",
+    },
+    data: {
+      status: "resolved",
+      recoveredOrderId: input.orderId,
+      resolutionSource: input.resolutionSource,
+      resolvedAt: new Date(),
+    },
+  });
 }
