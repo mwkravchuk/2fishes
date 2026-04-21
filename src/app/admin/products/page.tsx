@@ -21,7 +21,7 @@ export default async function AdminProductsPage() {
             >
               <div
                 className={[
-                  "aspect-[5/5] overflow-hidden bg-[#d8d0c4] transition-all",
+                  "ui-surface-muted aspect-[5/5] overflow-hidden transition-all",
                   product.isActive
                     ? "opacity-100"
                     : "opacity-60 grayscale hover:grayscale-0 hover:opacity-100",

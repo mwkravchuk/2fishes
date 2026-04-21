@@ -17,14 +17,11 @@ export default async function CheckoutSuccessPage({
     return (
       <section className="mt-16 pb-24">
         <div className="mx-auto max-w-[1080px]">
-          <p className="mt-8 text-[18px] leading-[1.15]">
+          <p className="ui-body-loose mt-8">
             We could not find your checkout session.
           </p>
           <div className="mt-10">
-            <Link
-              href="/shop"
-              className="inline-block border border-black px-5 py-3.5 text-[18px] leading-none hover:underline"
-            >
+            <Link href="/shop" className="ui-button inline-block">
               Return to shop
             </Link>
           </div>

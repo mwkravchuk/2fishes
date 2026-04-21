@@ -68,7 +68,7 @@ export default async function AdminOrderDetailPage({
                       key={item.id}
                       className="grid grid-cols-[72px_1fr_auto] gap-5 border-b border-black/10 py-5"
                     >
-                      <div className="h-[72px] w-[72px] overflow-hidden bg-[#d8d0c4]">
+                      <div className="ui-thumb-md">
                         {item.product?.imageKey ? (
                           <img
                             src={getProductImageUrl(item.product.imageKey)}

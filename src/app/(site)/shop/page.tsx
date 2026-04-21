@@ -24,7 +24,7 @@ export default async function ShopPage() {
                   href={`/shop/${product.slug}`}
                   className="group block w-full"
                 >
-                  <div className="aspect-square overflow-hidden bg-[#d8d0c4]">
+                  <div className="ui-surface-muted aspect-square overflow-hidden">
                     <img
                       src={imageUrl}
                       alt={product.name}

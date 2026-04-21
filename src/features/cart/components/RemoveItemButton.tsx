@@ -36,7 +36,7 @@ export default function RemoveItemButton({ cartItemId }: Props) {
     <button
       onClick={handleRemove}
       disabled={isSubmitting}
-      className="text-[18px] leading-none hover:underline cursor-pointer disabled:opacity-40"
+      className="ui-body cursor-pointer hover:underline disabled:opacity-40"
     >
       ( x )
     </button>

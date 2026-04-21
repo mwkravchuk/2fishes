@@ -100,22 +100,20 @@ export default function SuccessOrderStatus({
       <div className="mx-auto max-w-[1080px]">
         <div className="grid gap-16 md:grid-cols-[minmax(0,1.15fr)_320px] md:items-start">
           <div className="max-w-[640px]">
-            <h1 className="text-[18px] leading-[0.92]">
-              Thank you for your order!
-            </h1>
+            <h1 className="ui-body-tight">Thank you for your order!</h1>
 
-            <p className="mt-10 text-[18px] leading-[1.15]">
+            <p className="ui-body-loose mt-10">
               Your payment was received and we’re processing your order now.
             </p>
 
-            <p className="mt-4 text-[18px] leading-[1.2]">
+            <p className="ui-body-copy mt-4">
               {isPolling
                 ? "Finalizing your receipt..."
                 : "You’ll receive a confirmation email shortly."}
             </p>
 
             {timedOut ? (
-              <p className="mt-4 text-[18px] leading-[1.2]">
+              <p className="ui-body-copy mt-4">
                 We’re still finalizing your order record. Your payment went
                 through.
               </p>
@@ -124,7 +122,7 @@ export default function SuccessOrderStatus({
             <div className="mt-12">
               <Link
                 href="/shop"
-                className="inline-block border border-black px-6 py-4 text-[18px] leading-none hover:underline"
+                className="ui-button ui-button-roomy inline-block"
               >
                 Continue shopping
               </Link>
@@ -132,9 +130,9 @@ export default function SuccessOrderStatus({
           </div>
 
           <aside className="border border-black p-6">
-            <p className="text-[18px] leading-none">What happens next</p>
+            <p className="ui-body">What happens next</p>
 
-            <div className="mt-8 space-y-6 text-[18px] leading-[1.2]">
+            <div className="ui-body-copy mt-8 space-y-6">
               <div>
                 <p>Confirmation email</p>
                 <p className="mt-1">Sent shortly after checkout.</p>
@@ -159,10 +157,10 @@ export default function SuccessOrderStatus({
   return (
     <div className="mx-auto max-w-[900px]">
       <div className="flex flex-col gap-9">
-        <h1 className="text-[18px] leading-[0.92]">Thank you for your order!</h1>
+        <h1 className="ui-body-tight">Thank you for your order!</h1>
         <div className="flex flex-col gap-3">
-          <RoastScheduleNotice variant="success"/>
-          <p className="text-[18px] leading-[1.15]">
+          <RoastScheduleNotice variant="success" />
+          <p className="ui-body-loose">
             A confirmation email has been sent to{" "}
             <span className="font-bold">{order.customerEmail}</span>.
           </p>
@@ -171,7 +169,7 @@ export default function SuccessOrderStatus({
 
       <div className="mt-24 grid gap-16 md:grid-cols-2">
         <section>
-          <h2 className="text-[18px] leading-none">Order summary</h2>
+          <h2 className="ui-body">Order summary</h2>
 
           <div className="mt-4 border-t border-black">
             {order.items.map((item) => (
@@ -180,34 +178,28 @@ export default function SuccessOrderStatus({
                 className="flex items-start justify-between gap-6 py-5"
               >
                 <div className="min-w-0">
-                  <p className="font-display text-[18px] leading-none">
-                    {item.productNameSnap}
-                  </p>
-                  <p className="mt-2 text-[18px] leading-[1.2]">
+                  <p className="font-display ui-body">{item.productNameSnap}</p>
+                  <p className="ui-body-copy mt-2">
                     {formatBagSize(item.selectedSize)} •{" "}
                     {formatGrind(item.selectedGrind)}
                   </p>
                 </div>
 
-                <div className="shrink-0 text-[18px] leading-none">
-                  ×{item.quantity}
-                </div>
+                <div className="ui-body shrink-0">×{item.quantity}</div>
               </div>
             ))}
           </div>
 
           <div className="mt-10 flex items-center justify-between border-b border-black pb-4">
-            <span className="text-[18px] leading-none">Total</span>
-            <span className="text-[18px] leading-none">
-              {formatPrice(order.totalCents)}
-            </span>
+            <span className="ui-body">Total</span>
+            <span className="ui-body">{formatPrice(order.totalCents)}</span>
           </div>
         </section>
 
         <section>
-          <h2 className="text-[18px] leading-none">Shipping to</h2>
+          <h2 className="ui-body">Shipping to</h2>
 
-          <div className="mt-8 space-y-1 text-[18px] leading-[1.2]">
+          <div className="ui-body-copy mt-8 space-y-1">
             {order.shippingName ? <p>{order.shippingName}</p> : null}
             {order.shippingLine1 ? <p>{order.shippingLine1}</p> : null}
             {order.shippingLine2 ? <p>{order.shippingLine2}</p> : null}
@@ -224,7 +216,7 @@ export default function SuccessOrderStatus({
       <div className="mt-16">
         <Link
           href="/shop"
-          className="inline-block border border-black px-6 py-4 text-[18px] leading-none hover:underline"
+          className="ui-button ui-button-roomy inline-block"
         >
           Continue shopping
         </Link>

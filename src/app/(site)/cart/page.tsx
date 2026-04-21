@@ -44,7 +44,7 @@ export default async function CartPage() {
                     className="grid grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] items-start gap-6 border-b border-black py-3"
                   >
                     <div className="flex items-start gap-5">
-                      <div className="h-[66px] w-[66px] shrink-0 overflow-hidden bg-[#d8d0c4]">
+                      <div className="ui-thumb-sm shrink-0">
                         {item.product.imageKey ? (
                           <img
                             src={getProductImageUrl(item.product.imageKey)}
@@ -57,34 +57,30 @@ export default async function CartPage() {
                       <div className="space-y-1">
                         <Link
                           href={`/shop/${item.product.slug}`}
-                          className="font-display text-[18px] leading-none hover:underline"
+                          className="font-display ui-body hover:underline"
                         >
                           {item.productNameSnap}
                         </Link>
 
                         <div className="space-y-1 pt-2">
-                          <p className="text-[16px] leading-none">
+                          <p className="ui-body-sm">
                             {formatBagSize(item.selectedSize)}
                           </p>
-                          <p className="text-[16px] leading-none">
+                          <p className="ui-body-sm">
                             {formatGrindOption(item.selectedGrind)}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-[18px] leading-none">
-                      {formatPrice(item.unitPriceCents)}
-                    </div>
+                    <div className="ui-body">{formatPrice(item.unitPriceCents)}</div>
 
                     <QuantityControls
                       cartItemId={item.id}
                       quantity={item.quantity}
                     />
 
-                    <div className="text-[18px] leading-none">
-                      {formatPrice(lineTotalCents)}
-                    </div>
+                    <div className="ui-body">{formatPrice(lineTotalCents)}</div>
 
                     <div className="flex justify-end">
                       <RemoveItemButton cartItemId={item.id} />
@@ -97,8 +93,8 @@ export default async function CartPage() {
             <div className="mt-16 flex justify-end">
               <div className="w-full max-w-[420px]">
                 <div className="flex items-center justify-between border-b border-black pb-3">
-                  <span className="text-[18px] leading-none">Total</span>
-                  <span className="text-[18px] leading-none">
+                  <span className="ui-body">Total</span>
+                  <span className="ui-body">
                     {formatPrice(cart?.totalCents ?? 0)}
                   </span>
                 </div>
@@ -107,7 +103,7 @@ export default async function CartPage() {
                   <CheckoutButton />
                 </div>
 
-                <p className="mt-4 text-[16px] leading-[1.2]">
+                <p className="ui-body-sm-copy mt-4">
                   Taxes and shipping calculated at checkout.
                 </p>
               </div>
@@ -121,7 +117,7 @@ export default async function CartPage() {
 
 function CartHeader() {
   return (
-    <div className="grid grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] gap-6 pb-3 text-[18px] leading-none">
+    <div className="ui-body grid grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] gap-6 pb-3">
       <div>Product</div>
       <div>Price</div>
       <div>Quantity</div>
@@ -134,12 +130,12 @@ function EmptyCart() {
   return (
     <div className="max-w-[700px]">
       <div className="mt-10 border-t border-black pt-6">
-        <p className="text-[18px] leading-[1.1]">Your cart is empty.</p>
+        <p className="ui-body-snug">Your cart is empty.</p>
 
         <div className="mt-10">
           <Link
             href="/shop"
-            className="inline-block border border-black px-8 py-4 text-[18px] leading-none hover:underline"
+            className="ui-button ui-button-wide inline-block"
           >
             Continue shopping
           </Link>

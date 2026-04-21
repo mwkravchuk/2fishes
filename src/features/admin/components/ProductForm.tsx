@@ -18,7 +18,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="border px-4 py-2 disabled:opacity-50 cursor-pointer hover:underline"
+      className="ui-button-sm disabled:opacity-50"
     >
       {pending ? "Saving..." : label}
     </button>
@@ -64,7 +64,7 @@ export function ProductForm({
     <form action={action} className="grid gap-12 lg:grid-cols-[300px_minmax(0,1fr)]">
       <div className="space-y-6">
         <div>
-          <div className="aspect-square overflow-hidden bg-[#d8d0c4]">
+          <div className="ui-surface-muted aspect-square overflow-hidden">
             {previewUrl ? (
               <img
                 src={previewUrl}

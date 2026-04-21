@@ -57,17 +57,14 @@ export default function OrderFulfillmentForm({
         <input type="hidden" name="orderId" value={orderId} />
 
         <div>
-          <label
-            htmlFor="fulfillmentStatus"
-            className="block text-[16px] leading-none"
-          >
+          <label htmlFor="fulfillmentStatus" className="ui-field-label">
             Fulfillment status
           </label>
           <select
             id="fulfillmentStatus"
             name="fulfillmentStatus"
             defaultValue={fulfillmentStatus}
-            className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
+            className="ui-field-control mt-1.5"
           >
             <option value="pending">Pending</option>
             <option value="shipped">Shipped</option>
@@ -76,17 +73,14 @@ export default function OrderFulfillmentForm({
         </div>
 
         <div>
-          <label
-            htmlFor="paymentStatus"
-            className="block text-[16px] leading-none"
-          >
+          <label htmlFor="paymentStatus" className="ui-field-label">
             Payment status
           </label>
           <select
             id="paymentStatus"
             name="paymentStatus"
             defaultValue={paymentStatus}
-            className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
+            className="ui-field-control mt-1.5"
           >
             <option value="paid">Paid</option>
             <option value="refunded">Refunded</option>
@@ -94,10 +88,7 @@ export default function OrderFulfillmentForm({
         </div>
 
         <div>
-          <label
-            htmlFor="trackingCarrier"
-            className="block text-[16px] leading-none"
-          >
+          <label htmlFor="trackingCarrier" className="ui-field-label">
             Tracking carrier
           </label>
           <input
@@ -105,15 +96,12 @@ export default function OrderFulfillmentForm({
             name="trackingCarrier"
             defaultValue={trackingCarrier ?? ""}
             placeholder="USPS, UPS, etc."
-            className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
+            className="ui-field-control mt-1.5"
           />
         </div>
 
         <div>
-          <label
-            htmlFor="trackingNumber"
-            className="block text-[16px] leading-none"
-          >
+          <label htmlFor="trackingNumber" className="ui-field-label">
             Tracking number
           </label>
           <input
@@ -121,37 +109,37 @@ export default function OrderFulfillmentForm({
             name="trackingNumber"
             defaultValue={trackingNumber ?? ""}
             placeholder="Tracking number"
-            className="mt-1.5 w-full border-b bg-transparent py-1.5 text-[18px] leading-none"
+            className="ui-field-control mt-1.5"
           />
         </div>
 
         {state?.error ? (
-          <p className="text-[16px] leading-[1.2]">{state.error}</p>
+          <p className="ui-body-sm-copy">{state.error}</p>
         ) : null}
 
         {state?.success ? (
-          <p className="text-[16px] leading-[1.2]">Order details saved.</p>
+          <p className="ui-body-sm-copy">Order details saved.</p>
         ) : null}
 
         <button
           type="submit"
           disabled={isPending}
-          className="border border-black px-5 py-3.5 text-[18px] leading-none cursor-pointer hover:underline disabled:opacity-60"
+          className="ui-button"
         >
           {isPending ? "Saving..." : "Save changes"}
         </button>
       </form>
 
-      <div className="border-t border-black pt-6">
-        <p className="text-[16px] leading-none">Shipment email</p>
+      <div className="ui-panel-top">
+        <p className="ui-body-sm">Shipment email</p>
 
-        <p className="mt-3 text-[16px] leading-[1.2] text-black/70">
+        <p className="ui-body-sm-copy ui-muted mt-3">
           {shippingEmailSentAt
             ? `Sent ${formatSentAt(shippingEmailSentAt)}.`
             : "Not sent yet."}
         </p>
 
-        <p className="mt-2 text-[16px] leading-[1.2] text-black/55">
+        <p className="ui-body-sm-copy ui-subtle mt-2">
           Sending this email will notify the customer with the current tracking
           information.
         </p>
@@ -162,7 +150,7 @@ export default function OrderFulfillmentForm({
           <button
             type="submit"
             disabled={isEmailPending || !hasTracking}
-            className="border border-black px-5 py-3.5 text-[18px] leading-none cursor-pointer hover:underline disabled:opacity-60"
+            className="ui-button"
           >
             {isEmailPending
               ? "Sending..."
@@ -173,17 +161,17 @@ export default function OrderFulfillmentForm({
         </form>
 
         {!hasTracking ? (
-          <p className="mt-3 text-[16px] leading-[1.2] text-black/55">
+          <p className="ui-body-sm-copy ui-subtle mt-3">
             Add both a tracking carrier and tracking number before sending.
           </p>
         ) : null}
 
         {emailState?.error ? (
-          <p className="mt-3 text-[16px] leading-[1.2]">{emailState.error}</p>
+          <p className="ui-body-sm-copy mt-3">{emailState.error}</p>
         ) : null}
 
         {emailState?.success ? (
-          <p className="mt-3 text-[16px] leading-[1.2]">
+          <p className="ui-body-sm-copy mt-3">
             Shipment email sent.
           </p>
         ) : null}

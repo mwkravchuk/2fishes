@@ -25,7 +25,7 @@ export default function HomePage() {
 
         <div className="flex md:w-[52%] md:justify-start md:pt-8">
           <div className="w-full max-w-[620px]">
-            <div className="aspect-square bg-[#d8d0c4]">
+            <div className="ui-surface-muted aspect-square">
               <img
                 src="/homepage.avif"
                 alt="The shadow of two fishes, the owners of the coffee roasting company"

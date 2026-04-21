@@ -35,7 +35,7 @@ export default function CheckoutButton() {
       type="button"
       onClick={handleCheckout}
       disabled={isSubmitting}
-      className="w-full border border-black px-5 py-3.5 text-[18px] leading-none cursor-pointer hover:underline disabled:opacity-60"
+      className="ui-button ui-button-block"
     >
       {isSubmitting ? "Redirecting..." : "Continue to checkout"}
     </button>

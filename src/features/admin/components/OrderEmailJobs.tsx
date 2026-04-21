@@ -50,38 +50,38 @@ export default function OrderEmailJobs({ orderId, jobs }: Props) {
   );
 
   return (
-    <section className="border-t border-black pt-6">
-      <p className="text-[16px] leading-none">Order emails</p>
+    <section className="ui-panel-top">
+      <p className="ui-body-sm">Order emails</p>
 
       <div className="mt-5 space-y-5">
         {jobs.map((job) => (
-          <div key={job.id} className="border border-black/10 p-4">
+          <div key={job.id} className="border p-4" style={{ borderColor: "var(--color-border-soft)" }}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[16px] leading-none">{formatLabel(job.type)}</p>
-                <p className="mt-2 text-[15px] leading-[1.2] text-black/70 break-all">
+                <p className="ui-body-sm">{formatLabel(job.type)}</p>
+                <p className="ui-caption-copy ui-muted mt-2 break-all">
                   {job.recipient}
                 </p>
               </div>
 
               <div className="text-right">
-                <p className="text-[15px] leading-none uppercase tracking-[0.08em]">
+                <p className="ui-caption uppercase tracking-[0.08em]">
                   {job.status}
                 </p>
-                <p className="mt-2 text-[15px] leading-[1.2] text-black/70">
+                <p className="ui-caption-copy ui-muted mt-2">
                   Attempts: {job.attempts}
                 </p>
               </div>
             </div>
 
             {job.sentAt ? (
-              <p className="mt-3 text-[15px] leading-[1.2] text-black/70">
+              <p className="ui-caption-copy ui-muted mt-3">
                 Sent {formatSentAt(job.sentAt)}.
               </p>
             ) : null}
 
             {job.lastError ? (
-              <p className="mt-3 text-[15px] leading-[1.2]">
+              <p className="ui-caption-copy mt-3">
                 Last error: {job.lastError}
               </p>
             ) : null}
@@ -94,7 +94,7 @@ export default function OrderEmailJobs({ orderId, jobs }: Props) {
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="border border-black px-4 py-2.5 text-[16px] leading-none cursor-pointer hover:underline disabled:opacity-60"
+                  className="ui-button-sm"
                 >
                   {isPending ? "Retrying..." : "Retry email"}
                 </button>
@@ -105,11 +105,11 @@ export default function OrderEmailJobs({ orderId, jobs }: Props) {
       </div>
 
       {state?.error ? (
-        <p className="mt-4 text-[16px] leading-[1.2]">{state.error}</p>
+        <p className="ui-body-sm-copy mt-4">{state.error}</p>
       ) : null}
 
       {state?.success ? (
-        <p className="mt-4 text-[16px] leading-[1.2]">Email job retried.</p>
+        <p className="ui-body-sm-copy mt-4">Email job retried.</p>
       ) : null}
     </section>
   );

@@ -31,7 +31,7 @@ export default async function ProductDetailPage({
 
         <div className="mt-8 flex flex-col gap-10 md:flex-row md:items-start md:gap-12">
           <div className="w-full md:w-[50%]">
-            <div className="aspect-[5/5] overflow-hidden bg-[#d8d0c4]">
+            <div className="ui-surface-muted aspect-[5/5] overflow-hidden">
               {product.imageKey ? (
                 <img
                   src={getProductImageUrl(product.imageKey)}

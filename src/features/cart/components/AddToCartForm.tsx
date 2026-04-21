@@ -86,19 +86,19 @@ export default function AddToCartForm({
     <div>
       <div className="space-y-5">
         <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="text-[18px] leading-none">Size</span>
-          <span className="text-[18px] leading-none">12 oz</span>
+          <span className="ui-body">Size</span>
+          <span className="ui-body">12 oz</span>
         </div>
 
         <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="text-[18px] leading-none">Grind</span>
-          <span className="text-[18px] leading-none">Whole bean</span>
+          <span className="ui-body">Grind</span>
+          <span className="ui-body">Whole bean</span>
         </div>
 
         <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="text-[18px] leading-none">Quantity</span>
+          <span className="ui-body">Quantity</span>
 
-          <div className="flex items-center gap-5 text-[18px] leading-none">
+          <div className="ui-body flex items-center gap-5">
             <button
               type="button"
               onClick={decrement}
@@ -129,13 +129,13 @@ export default function AddToCartForm({
           type="button"
           onClick={handleAddToCart}
           disabled={isSubmitting}
-          className="w-full border border-black px-5 py-3.5 text-[18px] leading-none hover:underline cursor-pointer disabled:opacity-60"
+          className="ui-button ui-button-block"
         >
           {isSubmitting ? "Adding..." : "Add to cart"}
         </button>
 
         {message ? (
-          <p className="mt-4 text-[16px] leading-none">{message}</p>
+          <p className="ui-body-sm mt-4">{message}</p>
         ) : null}
       </div>
     </div>

@@ -14,7 +14,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="mt-8 border border-black px-5 py-3.5 text-[18px] leading-none cursor-pointer hover:underline"
+          className="ui-button mt-8"
         >
           Continue with Google
         </button>

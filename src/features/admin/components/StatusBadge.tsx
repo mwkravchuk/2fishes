@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 type StatusBadgeProps = {
   status: string;
 };
@@ -5,30 +7,50 @@ type StatusBadgeProps = {
 export default function StatusBadge({ status }: StatusBadgeProps) {
   const normalized = status.toLowerCase();
 
-  let className =
-    "inline-flex items-center border px-3 py-1 text-[15px] leading-none";
+  const className = "ui-status-badge";
+  let style: CSSProperties | undefined;
 
   if (normalized === "pending" || normalized === "in_progress") {
-    className += " border-[#d8c97a] bg-[#efe6b8] text-black";
+    style = {
+      "--status-border": "var(--status-warn-border)",
+      "--status-bg": "var(--status-warn-bg)",
+    } as CSSProperties;
   } else if (normalized === "shipped" || normalized === "fulfilled") {
-    className += " border-[#a9c29a] bg-[#dce8d6] text-black";
+    style = {
+      "--status-border": "var(--status-success-border)",
+      "--status-bg": "var(--status-success-bg)",
+    } as CSSProperties;
   } else if (normalized === "paid") {
-    className += " border-[#cfcfcf] bg-[#f3f3f3] text-black";
+    style = {
+      "--status-border": "var(--status-neutral-border)",
+      "--status-bg": "var(--status-neutral-bg)",
+    } as CSSProperties;
   } else if (normalized === "email_sent") {
-    className += " border-[#a9c29a] bg-[#dce8d6] text-black";
+    style = {
+      "--status-border": "var(--status-success-border)",
+      "--status-bg": "var(--status-success-bg)",
+    } as CSSProperties;
   } else if (
     normalized === "email_pending" ||
     normalized === "email_processing" ||
     normalized === "not_queued"
   ) {
-    className += " border-[#d8c97a] bg-[#efe6b8] text-black";
+    style = {
+      "--status-border": "var(--status-warn-border)",
+      "--status-bg": "var(--status-warn-bg)",
+    } as CSSProperties;
   } else if (normalized === "email_failed") {
-    className += " border-[#d3a1a1] bg-[#f2dada] text-black";
-  } else {
-    className += " border-black bg-white text-black";
+    style = {
+      "--status-border": "var(--status-danger-border)",
+      "--status-bg": "var(--status-danger-bg)",
+    } as CSSProperties;
   }
 
-  return <span className={className}>{formatStatus(status)}</span>;
+  return (
+    <span className={className} style={style}>
+      {formatStatus(status)}
+    </span>
+  );
 }
 
 function formatStatus(status: string) {

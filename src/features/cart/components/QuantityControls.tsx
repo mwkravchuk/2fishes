@@ -52,7 +52,7 @@ export default function QuantityControls({
 
   return (
     <div className="flex items-center justify-between gap-6">
-      <div className="flex items-center gap-2 text-[18px] leading-none">
+      <div className="ui-body flex items-center gap-2">
         <button
           type="button"
           onClick={() => updateQuantity(quantity - 1)}

@@ -99,7 +99,7 @@ export default function RoastScheduleNotice({
   if (variant === "success") {
     return (
       <div className={className}>
-        <p className="text-[18px] leading-[1.15]">
+        <p className="ui-body-loose">
           Your coffee is scheduled to be roasted on{" "}
           <span className="font-bold">{formatDate(roastDate)}</span> and shipped{" "}
           <span className="font-bold">{formatDate(shipDate)}</span>.
@@ -110,13 +110,13 @@ export default function RoastScheduleNotice({
 
   return (
     <div className={className}>
-      <p className="text-[18px] leading-[1.15]">
+      <p className="ui-body-loose">
         Order within {countdown} to be roasted on{" "}
         <span className="font-bold">{formatDate(roastDate)}</span> and shipped{" "}
         <span className="font-bold">{formatDate(shipDate)}</span>.
       </p>
 
-      <p className="mt-2 text-[16px] leading-[1.2] text-black/55">
+      <p className="ui-body-sm-copy ui-subtle mt-2">
         Orders placed after Friday at 11:59 PM PT roll into the following week’s
         roast.
       </p>
