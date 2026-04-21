@@ -41,7 +41,7 @@ export default async function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="grid gap-4 border-b border-black py-4 md:grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] md:items-start md:gap-6 md:py-3"
+                    className="grid gap-4 py-4 md:grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] md:items-start md:gap-6 md:py-5"
                   >
                     <div className="flex items-start gap-5">
                       <div className="ui-thumb-sm shrink-0">

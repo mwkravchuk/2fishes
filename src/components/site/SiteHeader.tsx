@@ -1,53 +1,19 @@
-import Link from "next/link";
-import CartCountLink from "./CartCountLink";
+import SiteHeaderClient from "./SiteHeaderClient";
 import { auth, signOut } from "@/auth";
 
 export default async function SiteHeader() {
   const session = await auth();
 
+  async function logoutAction() {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  }
+
   return (
-    <nav className="sticky top-0 z-50 bg-(--background)">
-      <div className="ui-page-full flex flex-wrap items-start justify-between gap-x-6 gap-y-3 py-4">
-        <Link
-          href="/"
-          className="font-display text-[16px] hover:underline"
-        >
-          2fishes
-        </Link>
-
-        <div className="flex items-center gap-8 text-[16px] md:gap-10">
-          <Link href="/shop" className="hover:underline">
-            Shop
-          </Link>
-          <Link href="/about" className="hover:underline">
-            About
-          </Link>
-
-          {/* Admin link */}
-          {session?.user?.isAdmin ? (
-            <Link href="/admin" className="hover:underline">
-              Admin
-            </Link>
-          ) : null}
-        </div>
-
-        <div className="flex items-center gap-2 text-[16px] md:gap-4">
-          {/* Logout */}
-          {session ? (
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/" });
-              }}
-            >
-              <button className="cursor-pointer hover:underline">
-                Log out
-              </button>
-            </form>
-          ) : null}
-          <CartCountLink />
-        </div>
-      </div>
-    </nav>
+    <SiteHeaderClient
+      isAdmin={Boolean(session?.user?.isAdmin)}
+      isLoggedIn={Boolean(session)}
+      logoutAction={session ? logoutAction : undefined}
+    />
   );
 }

@@ -70,7 +70,7 @@ export default function AddToCartForm({
         throw new Error(data.error || "Failed to add item to cart");
       }
 
-      emitCartChanged(data.itemCount);
+      emitCartChanged(data.itemCount, true);
       showTemporaryMessage("Added to cart");
     } catch (error) {
       console.error(error);
