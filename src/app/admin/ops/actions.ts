@@ -6,7 +6,7 @@ import {
   createOrderFromCheckoutSession,
   resolveCheckoutSessionId,
 } from "@/features/checkout/server/orders-from-stripe";
-import { prisma } from "@/lib/prisma";
+import { resolveCheckoutRecoveryIssue } from "@/features/checkout/server/checkout-recovery-issues";
 
 type ActionState = {
   error?: string;
@@ -34,17 +34,10 @@ export async function recoverOrderFromStripeSession(
       "admin_recovery"
     );
 
-    await prisma.checkoutRecoveryIssue.updateMany({
-      where: {
-        checkoutSessionId: normalizedCheckoutSessionId,
-        status: "open",
-      },
-      data: {
-        status: "resolved",
-        recoveredOrderId: result.orderId,
-        resolutionSource: "admin_recovery",
-        resolvedAt: new Date(),
-      },
+    await resolveCheckoutRecoveryIssue({
+      checkoutSessionId: normalizedCheckoutSessionId,
+      orderId: result.orderId,
+      resolutionSource: "admin_recovery",
     });
 
     revalidatePath("/admin");

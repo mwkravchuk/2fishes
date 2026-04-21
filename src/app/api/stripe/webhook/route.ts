@@ -3,6 +3,10 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { logError, logInfo } from "@/lib/logging";
 import { createOrderFromCheckoutSession } from "@/features/checkout/server/orders-from-stripe";
+import {
+  resolveCheckoutRecoveryIssue,
+  upsertOpenCheckoutRecoveryIssue,
+} from "@/features/checkout/server/checkout-recovery-issues";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
@@ -80,33 +84,16 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const cartId = session.client_reference_id ?? session.metadata?.cartId;
 
-      await prisma.checkoutRecoveryIssue.upsert({
-        where: { checkoutSessionId: session.id },
-        update: {
-          stripePaymentIntentId:
-            typeof session.payment_intent === "string"
-              ? session.payment_intent
-              : null,
-          cartId: typeof cartId === "string" ? cartId : null,
-          eventType: event.type,
-          lastError:
-            error instanceof Error ? error.message : "Webhook handler failed",
-          status: "open",
-          recoveredOrderId: null,
-          resolutionSource: null,
-          resolvedAt: null,
-        },
-        create: {
-          checkoutSessionId: session.id,
-          stripePaymentIntentId:
-            typeof session.payment_intent === "string"
-              ? session.payment_intent
-              : null,
-          cartId: typeof cartId === "string" ? cartId : null,
-          eventType: event.type,
-          lastError:
-            error instanceof Error ? error.message : "Webhook handler failed",
-        },
+      await upsertOpenCheckoutRecoveryIssue({
+        checkoutSessionId: session.id,
+        stripePaymentIntentId:
+          typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : null,
+        cartId: typeof cartId === "string" ? cartId : null,
+        eventType: event.type,
+        lastError:
+          error instanceof Error ? error.message : "Webhook handler failed",
       });
     }
 
@@ -116,23 +103,4 @@ export async function POST(request: Request) {
     });
     return new NextResponse("Webhook handler failed", { status: 500 });
   }
-}
-
-async function resolveCheckoutRecoveryIssue(input: {
-  checkoutSessionId: string;
-  orderId: string;
-  resolutionSource: string;
-}) {
-  await prisma.checkoutRecoveryIssue.updateMany({
-    where: {
-      checkoutSessionId: input.checkoutSessionId,
-      status: "open",
-    },
-    data: {
-      status: "resolved",
-      recoveredOrderId: input.orderId,
-      resolutionSource: input.resolutionSource,
-      resolvedAt: new Date(),
-    },
-  });
 }
