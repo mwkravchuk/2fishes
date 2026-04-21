@@ -9,7 +9,7 @@ const average = Average({
 
 export const metadata: Metadata = {
   title: "2fishes",
-  description: "Small batch coffee roasters",
+  description: "Small batch coffee roaster",
 };
 
 export default function RootLayout({
