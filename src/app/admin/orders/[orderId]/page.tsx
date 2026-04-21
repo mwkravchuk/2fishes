@@ -44,9 +44,9 @@ export default async function AdminOrderDetailPage({
   }
 
   return (
-    <section className="mt-16 pb-24">
+    <section className="mt-10 pb-24 md:mt-16">
       <div className="ui-page-wide">
-        <div className="mt-10 grid gap-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
+        <div className="mt-6 grid gap-12 md:mt-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
           <div>
             <p className="text-[15px] leading-none">
               <Link href="/admin/orders" className="hover:underline">

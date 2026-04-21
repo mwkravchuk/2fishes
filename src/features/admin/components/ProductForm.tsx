@@ -61,7 +61,10 @@ export function ProductForm({
   }, [selectedFile, previewUrl]);
 
   return (
-    <form action={action} className="grid gap-12 lg:grid-cols-[300px_minmax(0,1fr)]">
+    <form
+      action={action}
+      className="grid gap-10 md:gap-12 lg:grid-cols-[300px_minmax(0,1fr)]"
+    >
       <div className="space-y-6">
         <div>
           <div className="ui-surface-muted aspect-square overflow-hidden">
@@ -81,61 +84,68 @@ export function ProductForm({
             type="file"
             accept="image/*"
             required={!product}
-            className="block w-full cursor-pointer px-3 py-2 border"
+            className="block w-full cursor-pointer border px-3 py-2 text-[16px] leading-[1.2]"
             onChange={(e) => {
               const file = e.target.files?.[0] ?? null;
               setSelectedFile(file);
             }}
           />
           {product && (
-            <p className="mt-2 text-sm opacity-70">
+            <p className="mt-2 text-[15px] leading-[1.25] opacity-70">
               Select a new file to preview it here before saving.
             </p>
           )}
         </div>
 
         <div className="border-t pt-4">
-          <label className="flex items-center gap-2">
+          <label className="flex items-start gap-2 text-[16px] leading-[1.2]">
             <input
               type="checkbox"
               name="isActive"
               defaultChecked={product?.isActive ?? true}
+              className="mt-[1px]"
             />
             <span>Visible to storefront</span>
           </label>
-          <p className="mt-2 text-sm opacity-70">
+          <p className="mt-2 text-[15px] leading-[1.25] opacity-70">
             Turn this off to hide the product from the storefront.
           </p>
         </div>
       </div>
 
-      <div className="space-y-16">
+      <div className="space-y-12 md:space-y-16">
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <label className="block mb-4">Name</label>
+              <label className="mb-3 block text-[16px] leading-none md:mb-4">
+                Name
+              </label>
               <input
                 name="name"
                 defaultValue={product?.name ?? ""}
                 required
-                className="w-full border-b pb-1.5"
+                className="w-full border-b pb-2 text-[16px] leading-[1.2]"
               />
             </div>
 
             <div>
-              <label className="block mb-4">Slug</label>
+              <label className="mb-3 block text-[16px] leading-none md:mb-4">
+                Slug
+              </label>
               <input
                 name="slug"
                 defaultValue={product?.slug ?? ""}
-                className="w-full border-b pb-1.5"
+                className="w-full border-b pb-2 text-[16px] leading-[1.2]"
               />
-              <p className="mt-1 text-sm opacity-70">
+              <p className="mt-2 text-[15px] leading-[1.25] opacity-70">
                 Leave blank to auto-generate.
               </p>
             </div>
 
             <div>
-              <label className="block mb-4">Price (USD)</label>
+              <label className="mb-3 block text-[16px] leading-none md:mb-4">
+                Price (USD)
+              </label>
               <input
                 name="price"
                 type="number"
@@ -143,42 +153,48 @@ export function ProductForm({
                 step="0.01"
                 defaultValue={defaultPrice}
                 required
-                className="w-full border-b pb-1.5"
+                className="w-full border-b pb-2 text-[16px] leading-[1.2]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block mb-4">Description</label>
+            <label className="mb-3 block text-[16px] leading-none md:mb-4">
+              Description
+            </label>
             <textarea
               name="description"
               defaultValue={product?.description ?? ""}
               required
-              rows={1}
-              className="w-full border-b pb-1.5"
+              rows={3}
+              className="w-full resize-y border-b pb-2 text-[16px] leading-[1.35]"
             />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="block mb-4">Origin</label>
+              <label className="mb-3 block text-[16px] leading-none md:mb-4">
+                Origin
+              </label>
               <input
                 name="origin"
                 defaultValue={product?.origin ?? ""}
                 required
-                className="w-full border-b pb-1.5"
+                className="w-full border-b pb-2 text-[16px] leading-[1.2]"
               />
             </div>
 
             <div>
-              <label className="block mb-4">Flavor notes</label>
+              <label className="mb-3 block text-[16px] leading-none md:mb-4">
+                Flavor notes
+              </label>
               <input
                 name="flavorNotes"
                 defaultValue={defaultFlavorNotes}
                 placeholder="Chocolate, Citrus, Honey"
-                className="w-full border-b pb-1.5"
+                className="w-full border-b pb-2 text-[16px] leading-[1.2]"
               />
-              <p className="mt-1 text-sm opacity-70">
+              <p className="mt-2 text-[15px] leading-[1.25] opacity-70">
                 Comma-separated.
               </p>
             </div>
@@ -188,10 +204,15 @@ export function ProductForm({
         <div className="space-y-6">
           <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <label className="block mb-2">Available grinds</label>
+              <label className="mb-3 block text-[16px] leading-none">
+                Available grinds
+              </label>
               <div className="space-y-2">
                 {Object.values(GrindOption).map((grind) => (
-                  <label key={grind} className="flex items-center gap-2">
+                  <label
+                    key={grind}
+                    className="flex items-start gap-2 text-[16px] leading-[1.2]"
+                  >
                     <input
                       type="checkbox"
                       name="availableGrinds"
@@ -201,6 +222,7 @@ export function ProductForm({
                           ? product.availableGrinds.includes(grind)
                           : grind === GrindOption.whole_bean
                       }
+                      className="mt-[1px]"
                     />
                     <span>{formatEnumLabel(grind)}</span>
                   </label>
@@ -209,10 +231,15 @@ export function ProductForm({
             </div>
 
             <div>
-              <label className="block mb-2">Available sizes</label>
+              <label className="mb-3 block text-[16px] leading-none">
+                Available sizes
+              </label>
               <div className="space-y-2">
                 {Object.values(BagSize).map((size) => (
-                  <label key={size} className="flex items-center gap-2">
+                  <label
+                    key={size}
+                    className="flex items-start gap-2 text-[16px] leading-[1.2]"
+                  >
                     <input
                       type="checkbox"
                       name="availableSizes"
@@ -222,6 +249,7 @@ export function ProductForm({
                           ? product.availableSizes.includes(size)
                           : size === BagSize.oz12
                       }
+                      className="mt-[1px]"
                     />
                     <span>{formatEnumLabel(size)}</span>
                   </label>

@@ -14,9 +14,9 @@ export default async function AdminOrdersPage() {
   });
 
   return (
-    <section className="mt-16 pb-24">
+    <section className="mt-10 pb-24 md:mt-16">
       <div className="ui-page-wide">
-        <div className="mt-12">
+        <div className="mt-6 md:mt-12">
           <div className="hidden grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none md:grid">
             <div>Order</div>
             <div>Customer</div>
@@ -38,7 +38,7 @@ export default async function AdminOrdersPage() {
                   href={`/admin/orders/${order.id}`}
                   className="block odd:bg-transparent even:bg-black/5 transition hover:bg-black/10"
                 >
-                  <div className="grid gap-5 px-0 py-5 md:grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] md:items-start md:gap-6 md:px-2">
+                  <div className="grid gap-5 px-3 py-5 md:grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] md:items-start md:gap-6 md:px-2">
                     <div>
                       <p className="text-[18px] leading-none">#{order.id}</p>
 

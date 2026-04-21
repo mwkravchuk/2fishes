@@ -6,9 +6,9 @@ import { ProductForm } from "@/features/admin/components/ProductForm";
 
 export default function NewProductPage() {
   return (
-    <main className="mt-10">
-      <div className="mx-auto max-w-[1080px]">
-        <div className="mb-8">
+    <main className="py-6 md:py-10">
+      <div className="ui-page-wide">
+        <div className="mb-6 md:mb-8">
           <Link href="/admin/products" className="hover:underline">
             ← Back to products
           </Link>

@@ -51,8 +51,8 @@
     --space-button-roomy-x: 1.25rem;
     --space-button-roomy-y: 0.875rem;
     --space-button-wide-x: 1.5rem;
-    --page-gutter: 0.875rem;
-    --page-gutter-wide: 1rem;
+    --page-gutter: 1rem;
+    --page-gutter-wide: 1.125rem;
   }
 }
 
@@ -232,6 +232,11 @@ body {
     width: 100%;
     max-width: 1080px;
     margin-inline: auto;
+    padding-inline: var(--page-gutter-wide);
+  }
+
+  .ui-page-full {
+    width: 100%;
     padding-inline: var(--page-gutter-wide);
   }
 

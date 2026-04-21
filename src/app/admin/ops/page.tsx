@@ -43,12 +43,7 @@ export default async function AdminOpsPage() {
             ← Back to admin
           </Link>
         </p>
-
-        <div className="mt-10">
-          <p className="text-[18px] leading-none opacity-70">Ops</p>
-          <h1 className="mt-3 text-[32px] leading-none">Email health</h1>
-        </div>
-
+        
         <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
           <div className="border border-black p-5 md:p-6">
             <p className="text-[18px] leading-none">Failed email jobs</p>

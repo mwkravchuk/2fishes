@@ -3,7 +3,7 @@ import RoastScheduleNotice from "@/components/RoastScheduleNotice";
 export default function HomePage() {
   return (
     <section className="flex flex-1 flex-col justify-center py-8 md:py-10">
-      <div className="ui-page-wide flex flex-col gap-10 md:flex-row md:items-start md:justify-around md:gap-16">
+      <div className="ui-page-full flex flex-col gap-10 md:flex-row md:items-start md:justify-between md:gap-16">
         <div className="md:w-[38%]">
           <div className="max-w-[420px]">
             <p className="font-display text-[64px] leading-[0.92] tracking-[-0.03em] sm:text-[88px] md:text-[120px] lg:text-[140px]">
