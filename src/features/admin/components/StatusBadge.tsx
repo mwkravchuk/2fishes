@@ -44,6 +44,16 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
       "--status-border": "var(--status-danger-border)",
       "--status-bg": "var(--status-danger-bg)",
     } as CSSProperties;
+  } else if (normalized === "ready_to_send") {
+    style = {
+      "--status-border": "var(--status-success-border)",
+      "--status-bg": "var(--status-success-bg)",
+    } as CSSProperties;
+  } else if (normalized === "tracking_needed") {
+    style = {
+      "--status-border": "var(--status-warn-border)",
+      "--status-bg": "var(--status-warn-bg)",
+    } as CSSProperties;
   }
 
   return (

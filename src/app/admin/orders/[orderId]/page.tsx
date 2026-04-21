@@ -186,11 +186,6 @@ export default async function AdminOrderDetailPage({
                 paymentStatus={order.paymentStatus}
                 trackingCarrier={order.trackingCarrier}
                 trackingNumber={order.trackingNumber}
-                shippingEmailSentAt={
-                  order.shippingEmailSentAt
-                    ? order.shippingEmailSentAt.toISOString()
-                    : null
-                }
               />
             </section>
 
@@ -206,6 +201,14 @@ export default async function AdminOrderDetailPage({
                   sentAt: job.sentAt ? job.sentAt.toISOString() : null,
                   lastError: job.lastError,
                 }))}
+                shipmentEmail={{
+                  recipient: order.customerEmail,
+                  sentAt: order.shippingEmailSentAt
+                    ? order.shippingEmailSentAt.toISOString()
+                    : null,
+                  trackingCarrier: order.trackingCarrier,
+                  trackingNumber: order.trackingNumber,
+                }}
               />
             </section>
 

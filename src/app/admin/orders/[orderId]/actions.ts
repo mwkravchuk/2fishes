@@ -101,12 +101,10 @@ export async function sendShipmentEmail(
     return { error: "Order not found" };
   }
 
-  if (order.fulfillmentStatus !== "shipped") {
-    return { error: "Order must be marked shipped before sending email" };
-  }
-
-  if (!order.trackingNumber) {
-    return { error: "Tracking number is required before sending email" };
+  if (!order.trackingCarrier || !order.trackingNumber) {
+    return {
+      error: "Save both tracking carrier and tracking number before sending email",
+    };
   }
 
   try {
