@@ -19,11 +19,11 @@ export default async function AdminPage() {
 
   return (
     <section className="pb-24">
-      <div className="mx-auto max-w-[1080px]">
-        <div className="mt-30 grid gap-8 md:grid-cols-3">
+      <div className="ui-page-wide">
+        <div className="mt-16 grid gap-6 md:mt-30 md:gap-8 md:grid-cols-3">
           <Link
             href="/admin/products"
-            className="block border border-black p-8 transition hover:bg-black/5"
+            className="block border border-black p-6 transition hover:bg-black/5 md:p-8"
           >
             <div className="flex items-start justify-between gap-6">
               <div>
@@ -40,7 +40,7 @@ export default async function AdminPage() {
 
           <Link
             href="/admin/orders"
-            className="block border border-black p-8 transition hover:bg-black/5"
+            className="block border border-black p-6 transition hover:bg-black/5 md:p-8"
           >
             <div className="flex items-start justify-between gap-6">
               <div>
@@ -57,7 +57,7 @@ export default async function AdminPage() {
 
           <Link
             href="/admin/ops"
-            className="block border border-black p-8 transition hover:bg-black/5"
+            className="block border border-black p-6 transition hover:bg-black/5 md:p-8"
           >
             <div className="flex items-start justify-between gap-6">
               <div>
@@ -73,7 +73,7 @@ export default async function AdminPage() {
           </Link>
         </div>
 
-        <div className="mt-24">
+        <div className="mt-16 md:mt-24">
           <div>
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>
@@ -92,7 +92,7 @@ export default async function AdminPage() {
               </div>
             </div>
 
-            <div className="mt-10 border-t border-black pt-6">
+            <div className="mt-8 border-t border-black pt-6 md:mt-10">
               {roastSummary.length === 0 ? (
                 <p className="text-[18px] leading-[1.2] opacity-70">
                   No pending orders in this week&apos;s roast window yet.

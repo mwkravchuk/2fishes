@@ -8,8 +8,8 @@ export default async function AdminProductsPage() {
   });
 
   return (
-    <div className="mx-auto mt-24 max-w-[1080px]">
-      <div className="grid grid-cols-2 gap-x-20 gap-y-4 md:grid-cols-4">
+    <div className="ui-page-wide mt-16 md:mt-24">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-20 md:gap-y-4">
         {products.map((product) => {
           const imageUrl = getProductImageUrl(product.imageKey);
 
@@ -17,7 +17,7 @@ export default async function AdminProductsPage() {
             <Link
               key={product.id}
               href={`/admin/products/${product.id}/edit`}
-              className="group block w-full max-w-[280px]"
+              className="group block w-full max-w-none md:max-w-[280px]"
             >
               <div
                 className={[
@@ -35,7 +35,7 @@ export default async function AdminProductsPage() {
               </div>
 
               <div className="mt-3 min-h-[72px]">
-                <div className="invisible group-hover:visible">
+                <div className="visible md:invisible md:group-hover:visible">
                   <div className="flex items-baseline justify-between gap-4">
                     <p className="text-[18px] leading-[1.05]">
                       {product.name}
@@ -56,14 +56,14 @@ export default async function AdminProductsPage() {
 
         <Link
           href="/admin/products/new"
-          className="group block w-full max-w-[280px]"
+          className="group block w-full max-w-none md:max-w-[280px]"
         >
           <div className="flex aspect-[5/5] items-center justify-center border border-black">
             <span className="text-[64px] leading-none">+</span>
           </div>
 
           <div className="mt-3 min-h-[72px]">
-            <div className="invisible group-hover:visible">
+            <div className="visible md:invisible md:group-hover:visible">
               <p className="text-[18px] leading-[1.05]">New Product</p>
             </div>
           </div>

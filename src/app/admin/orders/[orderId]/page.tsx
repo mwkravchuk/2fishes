@@ -45,8 +45,8 @@ export default async function AdminOrderDetailPage({
 
   return (
     <section className="mt-16 pb-24">
-      <div className="mx-auto max-w-[1080px]">
-        <div className="mt-14 grid gap-16 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="ui-page-wide">
+        <div className="mt-10 grid gap-12 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
           <div>
             <p className="text-[15px] leading-none">
               <Link href="/admin/orders" className="hover:underline">
@@ -60,13 +60,13 @@ export default async function AdminOrderDetailPage({
               Placed {formatDate(order.createdAt)}
             </p>
 
-            <div className="space-y-14">
+            <div className="space-y-10 md:space-y-14">
               <section>
                 <div className="mt-4 border-t border-black">
                   {order.items.map((item) => (
                     <div
                       key={item.id}
-                      className="grid grid-cols-[72px_1fr_auto] gap-5 border-b border-black/10 py-5"
+                      className="grid grid-cols-[72px_minmax(0,1fr)] gap-4 border-b border-black/10 py-5 md:grid-cols-[72px_1fr_auto] md:gap-5"
                     >
                       <div className="ui-thumb-md">
                         {item.product?.imageKey ? (
@@ -102,7 +102,7 @@ export default async function AdminOrderDetailPage({
                         </div>
                       </div>
 
-                      <div className="text-[18px] leading-none">
+                      <div className="text-[18px] leading-none md:text-right">
                         {formatPrice(item.unitPriceCents * item.quantity)}
                       </div>
                     </div>
@@ -127,7 +127,7 @@ export default async function AdminOrderDetailPage({
                 </div>
               </section>
 
-              <div className="grid gap-12 md:grid-cols-2">
+              <div className="grid gap-10 md:grid-cols-2 md:gap-12">
                 <section>
                   <h2 className="text-[18px] leading-none">Customer</h2>
 
@@ -158,9 +158,9 @@ export default async function AdminOrderDetailPage({
             </div>
           </div>
 
-          <aside className="space-y-17.5 border-l pl-10">
+          <aside className="space-y-10 border-t border-black pt-8 lg:space-y-17.5 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
             <section>
-              <div className="mt-5 flex gap-5">
+              <div className="mt-5 flex flex-wrap gap-5">
                 <div>
                   <p className="text-[15px] leading-none opacity-70">Payment</p>
                   <div className="mt-2">

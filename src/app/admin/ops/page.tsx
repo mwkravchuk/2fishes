@@ -37,7 +37,7 @@ export default async function AdminOpsPage() {
 
   return (
     <section className="mt-16 pb-24">
-      <div className="mx-auto max-w-[1080px]">
+      <div className="ui-page-wide">
         <p className="text-[15px] leading-none">
           <Link href="/admin" className="hover:underline">
             ← Back to admin
@@ -49,8 +49,8 @@ export default async function AdminOpsPage() {
           <h1 className="mt-3 text-[32px] leading-none">Email health</h1>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="border border-black p-6">
+        <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
+          <div className="border border-black p-5 md:p-6">
             <p className="text-[18px] leading-none">Failed email jobs</p>
             <p className="mt-3 text-[28px] leading-none">
               {failedEmailJobsCount}
@@ -60,7 +60,7 @@ export default async function AdminOpsPage() {
             </p>
           </div>
 
-          <div className="border border-black p-6">
+          <div className="border border-black p-5 md:p-6">
             <p className="text-[18px] leading-none">Pending email jobs</p>
             <p className="mt-3 text-[28px] leading-none">
               {pendingEmailJobsCount}
@@ -86,7 +86,7 @@ export default async function AdminOpsPage() {
                   href={`/admin/orders/${job.order.id}`}
                   className="block border border-black/10 p-4 transition hover:bg-black/5"
                 >
-                  <div className="flex items-start justify-between gap-6">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
                     <div>
                       <p className="text-[18px] leading-none">
                         Order #{job.order.id}

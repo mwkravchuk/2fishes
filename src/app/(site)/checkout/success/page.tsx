@@ -16,7 +16,7 @@ export default async function CheckoutSuccessPage({
   if (!session_id) {
     return (
       <section className="mt-16 pb-24">
-        <div className="mx-auto max-w-[1080px]">
+        <div className="ui-page-wide">
           <p className="ui-body-loose mt-8">
             We could not find your checkout session.
           </p>

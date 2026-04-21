@@ -23,14 +23,14 @@ export default async function ProductDetailPage({
   }
 
   return (
-    <section className="mt-12 pb-20">
-      <div className="mx-auto max-w-[800px]">
-        <h1 className="mb-4 -ml-8 font-display text-[54px] leading-[0.92] md:-ml-16">
+    <section className="mt-10 pb-20 md:mt-12">
+      <div className="ui-page-narrow">
+        <h1 className="mb-4 font-display text-[44px] leading-[0.92] md:-ml-16 md:text-[54px]">
           {product.name}
         </h1>
 
-        <div className="mt-8 flex flex-col gap-10 md:flex-row md:items-start md:gap-12">
-          <div className="w-full md:w-[50%]">
+        <div className="mt-6 flex flex-col gap-8 md:mt-8 md:flex-row md:items-start md:gap-12">
+          <div className="mx-auto w-full max-w-[440px] md:mx-0 md:w-[50%] md:max-w-none">
             <div className="ui-surface-muted aspect-[5/5] overflow-hidden">
               {product.imageKey ? (
                 <img
@@ -57,7 +57,7 @@ export default async function ProductDetailPage({
               </p>
             </div>
 
-            <div className="mt-14">
+            <div className="mt-10 md:mt-14">
               <AddToCartForm
                 productId={product.id}
                 selectedSize="oz12"

@@ -97,8 +97,8 @@ export default function SuccessOrderStatus({
 
   if (!order) {
     return (
-      <div className="mx-auto max-w-[1080px]">
-        <div className="grid gap-16 md:grid-cols-[minmax(0,1.15fr)_320px] md:items-start">
+      <div className="ui-page-wide">
+        <div className="grid gap-10 md:grid-cols-[minmax(0,1.15fr)_320px] md:items-start md:gap-16">
           <div className="max-w-[640px]">
             <h1 className="ui-body-tight">Thank you for your order!</h1>
 
@@ -155,7 +155,7 @@ export default function SuccessOrderStatus({
   }
 
   return (
-    <div className="mx-auto max-w-[900px]">
+    <div className="ui-page-tight">
       <div className="flex flex-col gap-9">
         <h1 className="ui-body-tight">Thank you for your order!</h1>
         <div className="flex flex-col gap-3">
@@ -167,7 +167,7 @@ export default function SuccessOrderStatus({
         </div>
       </div>
 
-      <div className="mt-24 grid gap-16 md:grid-cols-2">
+      <div className="mt-16 grid gap-12 md:mt-24 md:grid-cols-2 md:gap-16">
         <section>
           <h2 className="ui-body">Order summary</h2>
 

@@ -22,14 +22,14 @@ export default async function CartPage() {
 
   return (
     <section className="mt-16 pb-24">
-      <div className="mx-auto max-w-[800px]">
+      <div className="ui-page-narrow">
         {items.length === 0 ? (
           <EmptyCart />
         ) : (
           <div>
             <RoastScheduleNotice
               variant="cart"
-              className="mb-16 max-w-[1080px]"
+              className="mb-10 md:mb-16 md:max-w-[1080px]"
             />
 
             <CartHeader />
@@ -41,7 +41,7 @@ export default async function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="grid grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] items-start gap-6 border-b border-black py-3"
+                    className="grid gap-4 border-b border-black py-4 md:grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] md:items-start md:gap-6 md:py-3"
                   >
                     <div className="flex items-start gap-5">
                       <div className="ui-thumb-sm shrink-0">
@@ -73,16 +73,25 @@ export default async function CartPage() {
                       </div>
                     </div>
 
-                    <div className="ui-body">{formatPrice(item.unitPriceCents)}</div>
+                    <div className="flex items-center justify-between border-t border-black/10 pt-3 md:block md:border-t-0 md:pt-0">
+                      <span className="ui-body-sm ui-muted md:hidden">Price</span>
+                      <div className="ui-body">{formatPrice(item.unitPriceCents)}</div>
+                    </div>
 
-                    <QuantityControls
-                      cartItemId={item.id}
-                      quantity={item.quantity}
-                    />
+                    <div className="flex items-center justify-between md:block">
+                      <span className="ui-body-sm ui-muted md:hidden">Quantity</span>
+                      <QuantityControls
+                        cartItemId={item.id}
+                        quantity={item.quantity}
+                      />
+                    </div>
 
-                    <div className="ui-body">{formatPrice(lineTotalCents)}</div>
+                    <div className="flex items-center justify-between md:block">
+                      <span className="ui-body-sm ui-muted md:hidden">Subtotal</span>
+                      <div className="ui-body">{formatPrice(lineTotalCents)}</div>
+                    </div>
 
-                    <div className="flex justify-end">
+                    <div className="flex justify-start md:justify-end">
                       <RemoveItemButton cartItemId={item.id} />
                     </div>
                   </div>
@@ -117,7 +126,7 @@ export default async function CartPage() {
 
 function CartHeader() {
   return (
-    <div className="ui-body grid grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] gap-6 pb-3">
+    <div className="ui-body hidden grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] gap-6 pb-3 md:grid">
       <div>Product</div>
       <div>Price</div>
       <div>Quantity</div>

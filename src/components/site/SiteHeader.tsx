@@ -6,7 +6,8 @@ export default async function SiteHeader() {
   const session = await auth();
 
   return (
-    <nav className="sticky p-4 top-0 z-50 bg-(--background) flex items-start justify-between">
+    <nav className="sticky top-0 z-50 bg-(--background)">
+      <div className="ui-page-wide flex flex-wrap items-start justify-between gap-x-6 gap-y-3 py-4">
       <Link
         href="/"
         className="font-display text-[16px] leading-none hover:underline"
@@ -45,6 +46,7 @@ export default async function SiteHeader() {
           </form>
         ) : null}
         <CartCountLink />
+      </div>
       </div>
     </nav>
   );

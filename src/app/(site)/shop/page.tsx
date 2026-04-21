@@ -11,10 +11,12 @@ export default async function ShopPage() {
   return (
     <section className="mt-16 pb-16">
       {products.length === 0 ? (
-        <p className="mt-12 text-[22px]">No coffees available right now.</p>
+        <div className="ui-page-wide">
+          <p className="mt-12 text-[22px]">No coffees available right now.</p>
+        </div>
       ) : (
-        <div className="mx-auto mt-24 max-w-[1080px]">
-          <div className="grid grid-cols-1 gap-x-20 gap-y-16 md:grid-cols-3">
+        <div className="ui-page-wide mt-12 md:mt-24">
+          <div className="grid grid-cols-1 gap-y-12">
             {products.map((product) => {
               const imageUrl = getProductImageUrl(product.imageKey);
 
@@ -22,7 +24,7 @@ export default async function ShopPage() {
                 <Link
                   key={product.id}
                   href={`/shop/${product.slug}`}
-                  className="group block w-full"
+                  className="group mx-auto block w-full max-w-[460px]"
                 >
                   <div className="ui-surface-muted aspect-square overflow-hidden">
                     <img
@@ -33,7 +35,7 @@ export default async function ShopPage() {
                   </div>
 
                   <div className="mt-3 min-h-[56px]">
-                    <div className="invisible group-hover:visible">
+                    <div className="visible md:invisible md:group-hover:visible">
                       <div className="flex items-baseline justify-between gap-4">
                         <p className="text-[18px] leading-[1.05]">
                           {product.name}

@@ -15,9 +15,9 @@ export default async function AdminOrdersPage() {
 
   return (
     <section className="mt-16 pb-24">
-      <div className="mx-auto max-w-[1080px]">
+      <div className="ui-page-wide">
         <div className="mt-12">
-          <div className="grid grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none">
+          <div className="hidden grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] gap-6 border-b border-black pb-4 text-[18px] leading-none md:grid">
             <div>Order</div>
             <div>Customer</div>
             <div>Payment</div>
@@ -38,7 +38,7 @@ export default async function AdminOrdersPage() {
                   href={`/admin/orders/${order.id}`}
                   className="block odd:bg-transparent even:bg-black/5 transition hover:bg-black/10"
                 >
-                  <div className="grid grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] items-start gap-6 px-2 py-5">
+                  <div className="grid gap-5 px-0 py-5 md:grid-cols-[1.35fr_1.1fr_.75fr_.85fr_.85fr_.7fr] md:items-start md:gap-6 md:px-2">
                     <div>
                       <p className="text-[18px] leading-none">#{order.id}</p>
 
@@ -76,19 +76,23 @@ export default async function AdminOrdersPage() {
                       </div>
                     </div>
 
-                    <div className="pt-[2px]">
+                    <div className="flex items-center justify-between border-t border-black/10 pt-3 md:block md:border-t-0 md:pt-[2px]">
+                      <p className="ui-body-sm ui-muted md:hidden">Payment</p>
                       <StatusBadge status={order.paymentStatus} />
                     </div>
 
-                    <div className="pt-[2px]">
+                    <div className="flex items-center justify-between md:block md:pt-[2px]">
+                      <p className="ui-body-sm ui-muted md:hidden">Email</p>
                       <StatusBadge status={getOrderEmailStatus(order.emailJobs)} />
                     </div>
 
-                    <div className="pt-[2px]">
+                    <div className="flex items-center justify-between md:block md:pt-[2px]">
+                      <p className="ui-body-sm ui-muted md:hidden">Fulfillment</p>
                       <StatusBadge status={order.fulfillmentStatus} />
                     </div>
 
-                    <div className="text-right text-[18px] font-medium leading-none">
+                    <div className="flex items-center justify-between text-[18px] font-medium leading-none md:block md:text-right">
+                      <p className="ui-body-sm ui-muted font-normal md:hidden">Total</p>
                       {formatPrice(order.totalCents)}
                     </div>
                   </div>
