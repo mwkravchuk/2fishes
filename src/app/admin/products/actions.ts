@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { uploadToS3 } from "@/lib/s3";
 import { BagSize, GrindOption } from "@prisma/client";
 
 function slugify(input: string) {
@@ -48,13 +47,13 @@ export async function createProduct(formData: FormData) {
   const flavorNotesInput = String(formData.get("flavorNotes") || "").trim();
   const priceInput = String(formData.get("price") || "").trim();
   const isActive = formData.get("isActive") === "on";
-  const file = formData.get("image") as File | null;
+  const imageKey = String(formData.get("imageKey") || "").trim();
 
   if (!name) throw new Error("Name is required");
   if (!description) throw new Error("Description is required");
   if (!origin) throw new Error("Origin is required");
   if (!priceInput) throw new Error("Price is required");
-  if (!file || file.size === 0) throw new Error("Image is required");
+  if (!imageKey) throw new Error("Image is required");
 
   const slug = slugify(slugInput || name);
   const flavorNotes = parseFlavorNotes(flavorNotesInput);
@@ -80,8 +79,6 @@ export async function createProduct(formData: FormData) {
     throw new Error("A product with that slug already exists");
   }
 
-  const { key } = await uploadToS3(file, slug);
-
   await prisma.product.create({
     data: {
       name,
@@ -90,7 +87,7 @@ export async function createProduct(formData: FormData) {
       origin,
       flavorNotes,
       priceCents,
-      imageKey: key,
+      imageKey,
       isActive,
       availableGrinds,
       availableSizes,
@@ -118,7 +115,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   const flavorNotesInput = String(formData.get("flavorNotes") || "").trim();
   const priceInput = String(formData.get("price") || "").trim();
   const isActive = formData.get("isActive") === "on";
-  const file = formData.get("image") as File | null;
+  const nextImageKey = String(formData.get("imageKey") || "").trim();
 
   if (!name) throw new Error("Name is required");
   if (!description) throw new Error("Description is required");
@@ -152,12 +149,7 @@ export async function updateProduct(productId: string, formData: FormData) {
     throw new Error("Another product already uses that slug");
   }
 
-  let imageKey = existingProduct.imageKey;
-
-  if (file && file.size > 0) {
-    const upload = await uploadToS3(file, slug);
-    imageKey = upload.key;
-  }
+  const imageKey = nextImageKey || existingProduct.imageKey;
 
   await prisma.product.update({
     where: { id: productId },

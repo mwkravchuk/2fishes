@@ -41,6 +41,7 @@ export default async function EditProductPage({
             product={product}
             submitLabel="Save Changes"
             currentImageUrl={getProductImageUrl(product.imageKey)}
+            currentImageKey={product.imageKey}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { BagSize, GrindOption, Product } from "@prisma/client";
 
@@ -9,18 +9,25 @@ type ProductFormProps = {
   product?: Product;
   submitLabel: string;
   currentImageUrl?: string;
+  currentImageKey?: string;
 };
 
-function SubmitButton({ label }: { label: string }) {
+function SubmitButton({
+  label,
+  isPreparingUpload,
+}: {
+  label: string;
+  isPreparingUpload: boolean;
+}) {
   const { pending } = useFormStatus();
 
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || isPreparingUpload}
       className="ui-button-sm disabled:opacity-50"
     >
-      {pending ? "Saving..." : label}
+      {isPreparingUpload ? "Preparing image..." : pending ? "Saving..." : label}
     </button>
   );
 }
@@ -41,11 +48,16 @@ export function ProductForm({
   product,
   submitLabel,
   currentImageUrl,
+  currentImageKey,
 }: ProductFormProps) {
   const defaultPrice = product ? (product.priceCents / 100).toFixed(2) : "";
   const defaultFlavorNotes = product?.flavorNotes.join(", ") ?? "";
 
+  const formRef = useRef<HTMLFormElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadedImageKey, setUploadedImageKey] = useState(currentImageKey ?? "");
+  const [isPreparingUpload, setIsPreparingUpload] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const previewUrl = useMemo(() => {
     if (!selectedFile) return currentImageUrl ?? null;
@@ -60,9 +72,84 @@ export function ProductForm({
     };
   }, [selectedFile, previewUrl]);
 
+  useEffect(() => {
+    if (selectedFile) {
+      setUploadedImageKey("");
+    } else {
+      setUploadedImageKey(currentImageKey ?? "");
+    }
+  }, [selectedFile, currentImageKey]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (!selectedFile || uploadedImageKey) {
+      return;
+    }
+
+    event.preventDefault();
+    setUploadError(null);
+    setIsPreparingUpload(true);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const name = String(formData.get("name") || "").trim();
+      const slugInput = String(formData.get("slug") || "").trim();
+      const slug = slugify(slugInput || name);
+
+      if (!slug) {
+        throw new Error("Name is required before uploading an image");
+      }
+
+      const processedFile = await createSquareUploadFile(selectedFile, slug);
+
+      const presignResponse = await fetch("/api/admin/products/upload-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          slug,
+          filename: processedFile.name,
+          contentType: processedFile.type,
+        }),
+      });
+
+      const presignData = await presignResponse.json();
+
+      if (!presignResponse.ok || !presignData.ok) {
+        throw new Error(presignData.error || "Failed to prepare image upload");
+      }
+
+      const uploadResponse = await fetch(presignData.uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": processedFile.type,
+        },
+        body: processedFile,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      setUploadedImageKey(presignData.key);
+
+      requestAnimationFrame(() => {
+        formRef.current?.requestSubmit();
+      });
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "Failed to prepare image"
+      );
+    } finally {
+      setIsPreparingUpload(false);
+    }
+  }
+
   return (
     <form
+      ref={formRef}
       action={action}
+      onSubmit={handleSubmit}
       className="grid gap-10 md:gap-12 lg:grid-cols-[300px_minmax(0,1fr)]"
     >
       <div className="space-y-6">
@@ -80,16 +167,21 @@ export function ProductForm({
 
         <div>
           <input
-            name="image"
             type="file"
             accept="image/*"
-            required={!product}
+            required={!product && !uploadedImageKey}
             className="block w-full cursor-pointer border px-3 py-2 text-[16px] leading-[1.2]"
             onChange={(e) => {
               const file = e.target.files?.[0] ?? null;
               setSelectedFile(file);
             }}
           />
+          <input type="hidden" name="imageKey" value={uploadedImageKey} />
+          {uploadError ? (
+            <p className="mt-2 text-[15px] leading-[1.25]">
+              {uploadError}
+            </p>
+          ) : null}
           {product && (
             <p className="mt-2 text-[15px] leading-[1.25] opacity-70">
               Select a new file to preview it here before saving.
@@ -260,9 +352,97 @@ export function ProductForm({
         </div>
 
         <div className="border-t pt-6">
-          <SubmitButton label={submitLabel} />
+          <SubmitButton
+            label={submitLabel}
+            isPreparingUpload={isPreparingUpload}
+          />
         </div>
       </div>
     </form>
   );
+}
+
+function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "")
+    .replace(/\-+/g, "-");
+}
+
+async function createSquareUploadFile(file: File, slug: string) {
+  const image = await loadImage(file);
+  const canvas = document.createElement("canvas");
+  const outputSize = 1600;
+  canvas.width = outputSize;
+  canvas.height = outputSize;
+
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Canvas is unavailable");
+  }
+
+  const cropSize = Math.min(image.naturalWidth, image.naturalHeight);
+  const offsetX = (image.naturalWidth - cropSize) / 2;
+  const offsetY = (image.naturalHeight - cropSize) / 2;
+
+  context.drawImage(
+    image,
+    offsetX,
+    offsetY,
+    cropSize,
+    cropSize,
+    0,
+    0,
+    outputSize,
+    outputSize
+  );
+
+  const blob = await canvasToBlob(canvas, "image/jpeg", 0.92);
+
+  return new File([blob], `${slug}.jpg`, {
+    type: "image/jpeg",
+  });
+}
+
+function loadImage(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Failed to load selected image"));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number
+) {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Failed to process image"));
+          return;
+        }
+
+        resolve(blob);
+      },
+      type,
+      quality
+    );
+  });
 }
