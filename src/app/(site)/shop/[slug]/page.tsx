@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getProductImageUrl } from "@/lib/product-images";
 import AddToCartForm from "@/features/cart/components/AddToCartForm";
+import { formatPrice } from "@/lib/cart";
 
 type ProductDetailPageProps = {
   params: Promise<{
@@ -23,40 +24,48 @@ export default async function ProductDetailPage({
   }
 
   return (
-    <section className="mt-10 pb-20 md:mt-12">
-      <div className="ui-page-narrow">
-        <h1 className="mb-4 font-display text-[44px] leading-[0.92] md:-ml-16 md:text-[54px]">
-          {product.name}
-        </h1>
+    <section className="mt-8 pb-14 md:mt-8 md:pb-10">
+      <div className="ui-page-tight">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,420px)_minmax(0,1fr)] md:items-start md:gap-8 lg:grid-cols-[minmax(0,430px)_minmax(0,1fr)] lg:gap-10">
+          <div>
+            <div>
+              <p className="ui-caption tracking-[0.08em] uppercase">
+                {product.origin}
+              </p>
 
-        <div className="mt-6 flex flex-col gap-6 md:mt-8 md:flex-row md:items-start md:gap-12">
-          <div className="mx-auto w-full max-w-[320px] md:mx-0 md:w-[50%] md:max-w-none">
-            <div className="ui-surface-muted aspect-[5/5] overflow-hidden">
-              {product.imageKey ? (
-                <img
-                  src={getProductImageUrl(product.imageKey)}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : null}
+              <h1 className="mt-2 max-w-[10ch] font-display text-[42px] leading-[0.92] tracking-[-0.04em] md:text-[54px] lg:text-[62px]">
+                {product.name}
+              </h1>
+
+              <div className="mt-5">
+                <div className="ui-surface-muted aspect-[4/4.35] overflow-hidden">
+                  {product.imageKey ? (
+                    <img
+                      src={getProductImageUrl(product.imageKey)}
+                      alt={product.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : null}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="w-full md:w-[48%]">
-            <div className="space-y-5">
-              <p className="text-[18px] leading-[1.05]">
-                {product.description}
-              </p>
+          <div className="md:pt-8">
+            <div className="border-t border-black pt-4">
+              <div className="flex items-start justify-between gap-6">
+                <div className="max-w-[30ch] space-y-9">
+                  <p className="ui-body-loose max-w-[24ch]">{product.description}</p>
+                  <p className="ui-body whitespace-nowrap">
+                    ({product.flavorNotes.join(", ")})
+                  </p>
+                </div>
 
-              <div className="flex items-baseline justify-between gap-4 text-[18px] leading-[1.1]">
-                <p>({product.flavorNotes.join(", ")})</p>
-                <p className="shrink-0">
-                  ${(product.priceCents / 100).toFixed(2)}
-                </p>
+                <p className="ui-body shrink-0">{formatPrice(product.priceCents)}</p>
               </div>
             </div>
 
-            <div className="mt-8 md:mt-14">
+            <div className="mt-16 md:mt-24">
               <AddToCartForm
                 productId={product.id}
                 selectedSize="oz12"

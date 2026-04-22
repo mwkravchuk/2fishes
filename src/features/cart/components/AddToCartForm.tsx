@@ -70,60 +70,70 @@ export default function AddToCartForm({
   }
 
   return (
-    <div>
-      <div className="space-y-5">
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="ui-body">Size</span>
-          <span className="ui-body">12 oz</span>
-        </div>
+    <div className="border border-black px-5 py-5 md:px-7 md:py-6">
+      <div className="space-y-7">
+        <div>
+          <p className="ui-caption tracking-[0.08em] uppercase">Purchase</p>
 
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="ui-body">Grind</span>
-          <span className="ui-body">Whole bean</span>
-        </div>
+          <div className="mt-4 space-y-4 border-t border-black pt-4">
+            <div className="flex items-center justify-between gap-6 border-b border-black/15 pb-2">
+              <span className="ui-body">Size</span>
+              <span className="ui-body">12 oz</span>
+            </div>
 
-        <div className="flex items-center justify-between gap-6 border-b border-black pb-1">
-          <span className="ui-body">Quantity</span>
+            <div className="flex items-center justify-between gap-6 border-b border-black/15 pb-2">
+              <span className="ui-body">Grind</span>
+              <span className="ui-body">Whole bean</span>
+            </div>
 
-          <div className="ui-body flex items-center gap-5">
-            <button
-              type="button"
-              onClick={decrement}
-              className="cursor-pointer hover:underline"
-              aria-label="Decrease quantity"
-              disabled={isSubmitting}
-            >
-              -
-            </button>
+            <div className="flex items-center justify-between gap-6 border-b border-black/15 pb-2">
+              <span className="ui-body">Quantity</span>
 
-            <span className="min-w-[18px] text-center">{quantity}</span>
+              <div className="ui-body flex items-center gap-5">
+                <button
+                  type="button"
+                  onClick={decrement}
+                  className="cursor-pointer hover:underline"
+                  aria-label="Decrease quantity"
+                  disabled={isSubmitting}
+                >
+                  -
+                </button>
 
-            <button
-              type="button"
-              onClick={increment}
-              className="cursor-pointer hover:underline"
-              aria-label="Increase quantity"
-              disabled={isSubmitting}
-            >
-              +
-            </button>
+                <span className="min-w-[18px] text-center">{quantity}</span>
+
+                <button
+                  type="button"
+                  onClick={increment}
+                  className="cursor-pointer hover:underline"
+                  aria-label="Increase quantity"
+                  disabled={isSubmitting}
+                >
+                  +
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-20">
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={isSubmitting}
-          className="ui-button ui-button-block"
-        >
-          {isSubmitting ? "Adding..." : "Add to cart"}
-        </button>
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isSubmitting}
+            className="ui-button ui-button-block"
+          >
+            {isSubmitting ? "Adding..." : "Add to cart"}
+          </button>
+
+          <p className="ui-body-sm-copy ui-subtle">
+            Roasted weekly in small batches. Shipping is calculated at checkout.
+          </p>
+        </div>
 
         {feedbackMessage ? (
           <p
-            className={`ui-body-sm-copy mt-4 ${
+            className={`ui-body-sm-copy ${
               feedbackTone === "error" ? "text-red-700" : "ui-muted"
             }`}
             role={feedbackTone === "error" ? "alert" : "status"}
