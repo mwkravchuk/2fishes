@@ -17,6 +17,10 @@ export default function AddToCartForm({
 }: AddToCartFormProps) {
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<"success" | "error" | null>(
+    null
+  );
 
   function decrement() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -29,6 +33,8 @@ export default function AddToCartForm({
   async function handleAddToCart() {
     try {
       setIsSubmitting(true);
+      setFeedbackMessage(null);
+      setFeedbackTone(null);
 
       const response = await fetch("/api/cart/add", {
         method: "POST",
@@ -49,9 +55,15 @@ export default function AddToCartForm({
         throw new Error(data.error || "Failed to add item to cart");
       }
 
+      setFeedbackMessage("Added to cart.");
+      setFeedbackTone("success");
       emitCartChanged(data.itemCount, true);
     } catch (error) {
       console.error(error);
+      setFeedbackMessage(
+        error instanceof Error ? error.message : "Failed to add item to cart"
+      );
+      setFeedbackTone("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -108,6 +120,17 @@ export default function AddToCartForm({
         >
           {isSubmitting ? "Adding..." : "Add to cart"}
         </button>
+
+        {feedbackMessage ? (
+          <p
+            className={`ui-body-sm-copy mt-4 ${
+              feedbackTone === "error" ? "text-red-700" : "ui-muted"
+            }`}
+            role={feedbackTone === "error" ? "alert" : "status"}
+          >
+            {feedbackMessage}
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -3,7 +3,13 @@
 import { useActionState } from "react";
 import { runCheckoutReconciliation } from "@/app/admin/ops/actions";
 
-const initialState = {};
+type FormState = {
+  error?: string;
+  success?: boolean;
+  message?: string;
+};
+
+const initialState: FormState = {};
 
 export default function RunCheckoutReconciliationForm() {
   const [state, formAction, isPending] = useActionState(

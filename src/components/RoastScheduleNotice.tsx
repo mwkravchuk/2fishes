@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 type RoastScheduleNoticeProps = {
   variant?: "home" | "cart" | "success";
@@ -71,11 +71,23 @@ export default function RoastScheduleNotice({
   variant = "cart",
   className = "",
 }: RoastScheduleNoticeProps) {
-  const nowTimestamp = useSyncExternalStore(
-    subscribeToCountdown,
-    () => Date.now(),
-    () => 0
-  );
+  const [nowTimestamp, setNowTimestamp] = useState(0);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setNowTimestamp(Date.now());
+    });
+
+    const interval = window.setInterval(() => {
+      setNowTimestamp(Date.now());
+    }, 1000);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearInterval(interval);
+    };
+  }, []);
+
   const scheduleNow = nowTimestamp === 0 ? new Date() : new Date(nowTimestamp);
   const { roastDate, shipDate, cutoffDate } = getRoastSchedule(scheduleNow);
   const diff = cutoffDate.getTime() - scheduleNow.getTime();
@@ -121,9 +133,4 @@ export default function RoastScheduleNotice({
       </p>
     </div>
   );
-}
-
-function subscribeToCountdown(onStoreChange: () => void) {
-  const interval = window.setInterval(onStoreChange, 1000);
-  return () => window.clearInterval(interval);
 }

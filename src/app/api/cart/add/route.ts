@@ -6,6 +6,7 @@ import {
   CART_COOKIE_NAME,
   createCartSessionId,
 } from "@/lib/cart";
+import { logError } from "@/lib/logging";
 
 type AddToCartRequestBody = {
   productId: string;
@@ -54,7 +55,9 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error("Failed to add item to cart", error);
+    logError("cart_add_failed", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
 
     return NextResponse.json(
       {

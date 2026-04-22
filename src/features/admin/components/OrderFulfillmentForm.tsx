@@ -11,7 +11,12 @@ type Props = {
   trackingNumber: string | null;
 };
 
-const initialState = {};
+type FormState = {
+  error?: string;
+  success?: boolean;
+};
+
+const initialState: FormState = {};
 
 export default function OrderFulfillmentForm({
   orderId,

@@ -3,6 +3,7 @@
 :root {
   --background: #fffffe;
   --foreground: #111111;
+  --font-display: "Times New Roman";
   --color-border-strong: #111111;
   --color-border-soft: rgb(17 17 17 / 0.1);
   --color-surface-muted: #d8d0c4;

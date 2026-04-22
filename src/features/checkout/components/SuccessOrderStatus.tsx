@@ -38,6 +38,7 @@ export default function SuccessOrderStatus({
   const [order, setOrder] = useState<Order | null>(initialOrder);
   const [isPolling, setIsPolling] = useState(!initialOrder);
   const [timedOut, setTimedOut] = useState(false);
+  const [pollAttempt, setPollAttempt] = useState(0);
 
   useEffect(() => {
     if (order) return;
@@ -62,6 +63,7 @@ export default function SuccessOrderStatus({
         if (data.order) {
           setOrder(data.order);
           setIsPolling(false);
+          setTimedOut(false);
           return;
         }
 
@@ -93,7 +95,13 @@ export default function SuccessOrderStatus({
     return () => {
       cancelled = true;
     };
-  }, [order, sessionId]);
+  }, [order, pollAttempt, sessionId]);
+
+  function retryPolling() {
+    setTimedOut(false);
+    setIsPolling(true);
+    setPollAttempt((attempt) => attempt + 1);
+  }
 
   if (!order) {
     return (
@@ -113,10 +121,20 @@ export default function SuccessOrderStatus({
             </p>
 
             {timedOut ? (
-              <p className="ui-body-copy mt-4">
-                We’re still finalizing your order record. Your payment went
-                through.
-              </p>
+              <div className="mt-4 space-y-4">
+                <p className="ui-body-copy">
+                  We’re still finalizing your order record. Your payment went
+                  through, but the confirmation details are taking longer than
+                  expected to appear here.
+                </p>
+                <button
+                  type="button"
+                  onClick={retryPolling}
+                  className="ui-button"
+                >
+                  Check order status again
+                </button>
+              </div>
             ) : null}
 
             <div className="mt-12">

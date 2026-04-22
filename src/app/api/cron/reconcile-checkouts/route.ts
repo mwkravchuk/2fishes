@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const result = await reconcileRecentPaidCheckoutSessions();
+  const result = await reconcileRecentPaidCheckoutSessions("cron");
 
   return NextResponse.json(result, {
     status: result.ok ? 200 : 500,

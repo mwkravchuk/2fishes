@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { retryCheckoutRecoveryIssue } from "@/app/admin/ops/actions";
 
-const initialState = {};
+type FormState = {
+  error?: string;
+  success?: boolean;
+  orderId?: string;
+  message?: string;
+};
+
+const initialState: FormState = {};
 
 export default function RetryCheckoutRecoveryIssueForm({
   checkoutSessionId,

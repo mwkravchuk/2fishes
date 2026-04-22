@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   buildCustomerOrderConfirmationEmail,
@@ -55,10 +56,13 @@ function buildOrderEmailData(order: {
   };
 }
 
-export async function enqueueOrderEmailJobsTx(tx: typeof prisma, input: {
-  orderId: string;
-  customerEmail: string;
-}) {
+export async function enqueueOrderEmailJobsTx(
+  tx: Prisma.TransactionClient,
+  input: {
+    orderId: string;
+    customerEmail: string;
+  }
+) {
   await tx.emailJob.createMany({
     data: [
       {

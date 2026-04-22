@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { retryFailedEmailJob } from "@/app/admin/ops/actions";
 
-const initialState = {};
+type FormState = {
+  error?: string;
+  success?: boolean;
+  message?: string;
+};
+
+const initialState: FormState = {};
 
 export default function RetryFailedEmailJobForm({
   emailJobId,

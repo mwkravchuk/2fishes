@@ -244,7 +244,11 @@ function normalizeStripeLineItems(
       throw new Error(`Missing unit amount for line item ${item.id}`);
     }
 
-    if (!stripeProduct || typeof stripeProduct === "string") {
+    if (
+      !stripeProduct ||
+      typeof stripeProduct === "string" ||
+      stripeProduct.deleted
+    ) {
       throw new Error(`Missing expanded product for line item ${item.id}`);
     }
 

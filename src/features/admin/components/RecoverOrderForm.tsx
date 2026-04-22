@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { recoverOrderFromStripeSession } from "@/app/admin/ops/actions";
 
-const initialState = {};
+type FormState = {
+  error?: string;
+  success?: boolean;
+  orderId?: string;
+  existing?: boolean;
+};
+
+const initialState: FormState = {};
 
 export default function RecoverOrderForm() {
   const [state, formAction, isPending] = useActionState(
