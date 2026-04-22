@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { BagSize, GrindOption } from "@prisma/client";
 import { emitCartChanged } from "@/lib/cart-events";
 
@@ -17,14 +17,6 @@ export default function AddToCartForm({
 }: AddToCartFormProps) {
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
 
   function decrement() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -34,22 +26,9 @@ export default function AddToCartForm({
     setQuantity((q) => q + 1);
   }
 
-  function showTemporaryMessage(nextMessage: string) {
-    setMessage(nextMessage);
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      setMessage(null);
-    }, 2500);
-  }
-
   async function handleAddToCart() {
     try {
       setIsSubmitting(true);
-      setMessage(null);
 
       const response = await fetch("/api/cart/add", {
         method: "POST",
@@ -71,12 +50,8 @@ export default function AddToCartForm({
       }
 
       emitCartChanged(data.itemCount, true);
-      showTemporaryMessage("Added to cart");
     } catch (error) {
       console.error(error);
-      showTemporaryMessage(
-        error instanceof Error ? error.message : "Failed to add item to cart"
-      );
     } finally {
       setIsSubmitting(false);
     }
@@ -133,10 +108,6 @@ export default function AddToCartForm({
         >
           {isSubmitting ? "Adding..." : "Add to cart"}
         </button>
-
-        {message ? (
-          <p className="ui-body-sm mt-4">{message}</p>
-        ) : null}
       </div>
     </div>
   );
