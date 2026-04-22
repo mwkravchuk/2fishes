@@ -1,12 +1,10 @@
 import Link from "next/link";
 import RecoverOrderForm from "@/features/admin/components/RecoverOrderForm";
-import { reconcileRecentPaidCheckoutSessions } from "@/features/checkout/server/checkout-recovery-issues";
+import RunCheckoutReconciliationForm from "@/features/admin/components/RunCheckoutReconciliationForm";
 import { prisma } from "@/lib/prisma";
 import { getStripePaymentDashboardUrl } from "@/lib/stripe-dashboard";
 
 export default async function AdminOpsPage() {
-  const reconciliation = await reconcileRecentPaidCheckoutSessions();
-
   const [
     failedEmailJobsCount,
     pendingEmailJobsCount,
@@ -67,22 +65,10 @@ export default async function AdminOpsPage() {
             ← Back to admin
           </Link>
         </p>
-
-        <div className="mt-6 text-[16px] leading-[1.25] opacity-70">
-          {reconciliation.ok ? (
-            <p>
-              Stripe reconciliation checked {reconciliation.checkedSessions} paid
-              sessions from the last {reconciliation.lookbackHours} hours and
-              flagged {reconciliation.missingOrders} missing orders.
-            </p>
-          ) : (
-            <p>
-              Stripe reconciliation could not run: {reconciliation.error}
-            </p>
-          )}
-        </div>
         
         <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
+          <RunCheckoutReconciliationForm />
+
           <div className="border border-black p-5 md:p-6">
             <p className="text-[18px] leading-none">
               Open checkout recovery issues
