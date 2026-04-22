@@ -51,7 +51,13 @@ export function formatBatchRange(start: Date, end: Date) {
 export async function getAdminDashboardData() {
   const { start, end } = getCurrentBatchWindow();
 
-  const [productCount, pendingOrdersCount, failedEmailJobsCount, batchOrders] =
+  const [
+    productCount,
+    pendingOrdersCount,
+    failedEmailJobsCount,
+    openCheckoutRecoveryIssuesCount,
+    batchOrders,
+  ] =
     await Promise.all([
       prisma.product.count(),
       prisma.order.count({
@@ -62,6 +68,11 @@ export async function getAdminDashboardData() {
       prisma.emailJob.count({
         where: {
           status: "failed",
+        },
+      }),
+      prisma.checkoutRecoveryIssue.count({
+        where: {
+          status: "open",
         },
       }),
       prisma.order.findMany({
@@ -117,6 +128,7 @@ export async function getAdminDashboardData() {
     productCount,
     pendingOrdersCount,
     failedEmailJobsCount,
+    opsAlertsCount: failedEmailJobsCount + openCheckoutRecoveryIssuesCount,
     batchOrdersCount: batchOrders.length,
     roastSummary,
     totalBatchBags,

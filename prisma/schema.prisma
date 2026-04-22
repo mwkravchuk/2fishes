@@ -171,3 +171,16 @@ model CheckoutRecoveryIssue {
 
   @@index([status, createdAt])
 }
+
+model CheckoutRecoveryScan {
+  id              String   @id @default(cuid())
+  source          String
+  ok              Boolean
+  checkedSessions Int
+  missingOrders   Int
+  resolvedIssues  Int
+  error           String?
+  createdAt       DateTime @default(now())
+
+  @@index([source, createdAt])
+}

@@ -11,6 +11,8 @@ import {
   reconcileRecentPaidCheckoutSessions,
   resolveCheckoutRecoveryIssue,
 } from "@/features/checkout/server/checkout-recovery-issues";
+import { prisma } from "@/lib/prisma";
+import { processEmailJob } from "@/features/checkout/server/email-jobs";
 
 type ActionState = {
   error?: string;
@@ -104,9 +106,10 @@ export async function runCheckoutReconciliation(
     return { error: "Unauthorized" };
   }
 
-  const result = await reconcileRecentPaidCheckoutSessions();
+  const result = await reconcileRecentPaidCheckoutSessions("admin_manual");
 
   revalidatePath("/admin/ops");
+  revalidatePath("/admin/ops/checkout-recovery");
 
   if (!result.ok) {
     return {
@@ -116,6 +119,103 @@ export async function runCheckoutReconciliation(
 
   return {
     success: true,
-    message: `Checked ${result.checkedSessions} paid sessions from the last ${result.lookbackHours} hours. Flagged ${result.missingOrders} missing orders and resolved ${result.resolvedIssues} existing issues.`,
+    message: `Checked ${result.checkedSessions} recent checkouts and found ${result.missingOrders} missing orders.`,
+  };
+}
+
+export async function retryCheckoutRecoveryIssue(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+
+  if (!session?.user?.isAdmin) {
+    return { error: "Unauthorized" };
+  }
+
+  const checkoutSessionId = formData.get("checkoutSessionId");
+
+  if (typeof checkoutSessionId !== "string" || !checkoutSessionId) {
+    return { error: "Missing checkout session ID" };
+  }
+
+  try {
+    const result = await createOrderFromCheckoutSession(
+      checkoutSessionId,
+      "admin_recovery"
+    );
+
+    await resolveCheckoutRecoveryIssue({
+      checkoutSessionId,
+      orderId: result.orderId,
+      resolutionSource: "admin_recovery",
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/ops");
+    revalidatePath("/admin/ops/checkout-recovery");
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${result.orderId}`);
+
+    return {
+      success: true,
+      existing: result.kind === "existing",
+      orderId: result.orderId,
+      message:
+        result.kind === "existing"
+          ? "Order already existed and the issue was resolved."
+          : "Order recovered successfully.",
+    };
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to recover order",
+    };
+  }
+}
+
+export async function retryFailedEmailJob(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+
+  if (!session?.user?.isAdmin) {
+    return { error: "Unauthorized" };
+  }
+
+  const emailJobId = formData.get("emailJobId");
+
+  if (typeof emailJobId !== "string" || !emailJobId) {
+    return { error: "Missing email job ID" };
+  }
+
+  const job = await prisma.emailJob.findUnique({
+    where: { id: emailJobId },
+    select: { orderId: true },
+  });
+
+  if (!job) {
+    return { error: "Email job not found" };
+  }
+
+  try {
+    await processEmailJob(emailJobId);
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to retry email job",
+    };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/ops");
+  revalidatePath("/admin/ops/email-failures");
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${job.orderId}`);
+
+  return {
+    success: true,
+    message: "Email job retried.",
   };
 }

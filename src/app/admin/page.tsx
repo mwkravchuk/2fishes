@@ -10,7 +10,7 @@ export default async function AdminPage() {
     end,
     productCount,
     pendingOrdersCount,
-    failedEmailJobsCount,
+    opsAlertsCount,
     batchOrdersCount,
     roastSummary,
     totalBatchBags,
@@ -63,10 +63,10 @@ export default async function AdminPage() {
               <div>
                 <div className="flex gap-2">
                   <h2 className="text-[24px] leading-none">Ops</h2>
-                  <p>({failedEmailJobsCount} alerts)</p>
+                  <p>({opsAlertsCount} alerts)</p>
                 </div>
                 <p className="mt-4 text-[18px] leading-[1.2] opacity-80">
-                  Review failed email jobs and low-frequency operational issues.
+                  Review checkout recovery issues, email failures, and future operational alerts.
                 </p>
               </div>
             </div>

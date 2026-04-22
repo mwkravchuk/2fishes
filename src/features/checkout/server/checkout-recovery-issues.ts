@@ -4,6 +4,8 @@ import { logError, logInfo } from "@/lib/logging";
 
 const RECONCILIATION_LOOKBACK_HOURS = 48;
 
+type ReconciliationSource = "cron" | "admin_manual";
+
 export async function upsertOpenCheckoutRecoveryIssue(input: {
   checkoutSessionId: string;
   stripePaymentIntentId?: string | null;
@@ -52,7 +54,9 @@ export async function resolveCheckoutRecoveryIssue(input: {
   });
 }
 
-export async function reconcileRecentPaidCheckoutSessions() {
+export async function reconcileRecentPaidCheckoutSessions(
+  source: ReconciliationSource
+) {
   const since = Math.floor(
     (Date.now() - RECONCILIATION_LOOKBACK_HOURS * 60 * 60 * 1000) / 1000
   );
@@ -136,14 +140,26 @@ export async function reconcileRecentPaidCheckoutSessions() {
     }
 
     logInfo("checkout_reconciliation_sweep_completed", {
+      source,
       lookbackHours: RECONCILIATION_LOOKBACK_HOURS,
       checkedSessions,
       missingOrders,
       resolvedIssues,
     });
 
+    await prisma.checkoutRecoveryScan.create({
+      data: {
+        source,
+        ok: true,
+        checkedSessions,
+        missingOrders,
+        resolvedIssues,
+      },
+    });
+
     return {
       ok: true as const,
+      source,
       lookbackHours: RECONCILIATION_LOOKBACK_HOURS,
       checkedSessions,
       missingOrders,
@@ -151,13 +167,27 @@ export async function reconcileRecentPaidCheckoutSessions() {
     };
   } catch (error) {
     logError("checkout_reconciliation_sweep_failed", {
+      source,
       lookbackHours: RECONCILIATION_LOOKBACK_HOURS,
       error:
         error instanceof Error ? error.message : "Reconciliation sweep failed",
     });
 
+    await prisma.checkoutRecoveryScan.create({
+      data: {
+        source,
+        ok: false,
+        checkedSessions: 0,
+        missingOrders: 0,
+        resolvedIssues: 0,
+        error:
+          error instanceof Error ? error.message : "Reconciliation sweep failed",
+      },
+    });
+
     return {
       ok: false as const,
+      source,
       lookbackHours: RECONCILIATION_LOOKBACK_HOURS,
       checkedSessions: 0,
       missingOrders: 0,
