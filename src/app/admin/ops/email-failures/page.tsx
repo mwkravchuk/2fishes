@@ -27,15 +27,15 @@ export default async function AdminEmailFailuresPage() {
   ]);
 
   return (
-    <section className="mt-16 pb-24">
+    <section className="ui-admin-page">
       <div className="ui-page-wide">
-        <p className="text-[15px] leading-none">
+        <p className="ui-admin-backlink">
           <Link href="/admin/ops" className="hover:underline">
             ← Back to ops
           </Link>
         </p>
 
-        <div className="mt-10 border border-black p-5 md:max-w-[320px] md:p-6">
+        <div className="ui-admin-block border border-black p-5 md:max-w-[320px] md:p-6">
           <p className="text-[18px] leading-none">Failed email jobs</p>
           <p className="mt-3 text-[28px] leading-none">{failedEmailJobsCount}</p>
           <p className="mt-3 text-[16px] leading-[1.25] opacity-70">
@@ -43,7 +43,7 @@ export default async function AdminEmailFailuresPage() {
           </p>
         </div>
 
-        <div className="mt-12 border-t border-black pt-6">
+        <div className="ui-admin-block border-t border-black pt-6">
           <p className="text-[18px] leading-none">Current failures</p>
 
           {failedEmailJobs.length === 0 ? (

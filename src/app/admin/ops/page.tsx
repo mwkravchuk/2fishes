@@ -17,15 +17,15 @@ export default async function AdminOpsPage() {
     ]);
 
   return (
-    <section className="mt-16 pb-24">
+    <section className="ui-admin-page">
       <div className="ui-page-wide">
-        <p className="text-[15px] leading-none">
+        <p className="ui-admin-backlink">
           <Link href="/admin" className="hover:underline">
             ← Back to admin
           </Link>
         </p>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 md:gap-6">
+        <div className="ui-admin-block grid gap-4 md:grid-cols-2 md:gap-6">
           <Link
             href="/admin/ops/checkout-recovery"
             className="block border border-black p-5 transition hover:bg-black/5 md:p-6"

@@ -18,9 +18,9 @@ export default async function AdminPage() {
   } = await getAdminDashboardData();
 
   return (
-    <section className="pb-24">
+    <section className="ui-admin-page">
       <div className="ui-page-wide">
-        <div className="mt-16 grid gap-6 md:mt-30 md:gap-8 md:grid-cols-3">
+        <div className="grid gap-6 md:gap-8 md:grid-cols-3">
           <Link
             href="/admin/products"
             className="block border border-black p-6 transition hover:bg-black/5 md:p-8"
@@ -73,7 +73,7 @@ export default async function AdminPage() {
           </Link>
         </div>
 
-        <div className="mt-16 md:mt-24">
+        <div className="ui-admin-block">
           <div>
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>

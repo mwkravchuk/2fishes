@@ -6,15 +6,15 @@ import { ProductForm } from "@/features/admin/components/ProductForm";
 
 export default function NewProductPage() {
   return (
-    <main className="py-6 md:py-10">
+    <main className="ui-admin-page">
       <div className="ui-page-wide">
-        <div className="mb-6 md:mb-8">
+        <div className="ui-admin-backlink">
           <Link href="/admin/products" className="hover:underline">
             ← Back to products
           </Link>
         </div>
 
-        <div>
+        <div className="ui-admin-block">
           <ProductForm
             action={createProduct}
             submitLabel="Create Product"

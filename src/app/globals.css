@@ -240,6 +240,32 @@ body {
     padding-inline: var(--page-gutter-wide);
   }
 
+  .ui-admin-page {
+    margin-top: 2.5rem;
+    padding-bottom: 6rem;
+  }
+
+  @media (min-width: 768px) {
+    .ui-admin-page {
+      margin-top: 4rem;
+    }
+  }
+
+  .ui-admin-backlink {
+    font-size: 0.9375rem;
+    line-height: var(--leading-flat);
+  }
+
+  .ui-admin-block {
+    margin-top: 2.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .ui-admin-block {
+      margin-top: 3rem;
+    }
+  }
+
   .ui-surface-muted {
     background: var(--color-surface-muted);
   }

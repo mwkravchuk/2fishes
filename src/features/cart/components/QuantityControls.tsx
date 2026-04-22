@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { emitCartChanged } from "@/lib/cart-events";
 
 type QuantityControlsProps = {
@@ -15,6 +15,14 @@ export default function QuantityControls({
 }: QuantityControlsProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingQuantity, setPendingQuantity] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (pendingQuantity !== null && quantity === pendingQuantity) {
+      setIsSubmitting(false);
+      setPendingQuantity(null);
+    }
+  }, [pendingQuantity, quantity]);
 
   async function updateQuantity(nextQuantity: number) {
     if (nextQuantity < 1) {
@@ -23,6 +31,7 @@ export default function QuantityControls({
 
     try {
       setIsSubmitting(true);
+      setPendingQuantity(nextQuantity);
 
       const response = await fetch(`/api/cart/items/${cartItemId}`, {
         method: "PATCH",
@@ -42,11 +51,10 @@ export default function QuantityControls({
 
       emitCartChanged(data.itemCount);
       router.refresh();
-
     } catch (error) {
       console.error(error);
-    } finally {
       setIsSubmitting(false);
+      setPendingQuantity(null);
     }
   }
 
@@ -63,7 +71,14 @@ export default function QuantityControls({
           -
         </button>
 
-        <span className="min-w-[18px] text-center">{quantity}</span>
+        <span
+          className={[
+            "min-w-[18px] text-center transition-opacity",
+            isSubmitting ? "opacity-40" : "opacity-100",
+          ].join(" ")}
+        >
+          {quantity}
+        </span>
 
         <button
           type="button"

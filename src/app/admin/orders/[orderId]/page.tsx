@@ -44,17 +44,17 @@ export default async function AdminOrderDetailPage({
   }
 
   return (
-    <section className="mt-10 pb-24 md:mt-16">
+    <section className="ui-admin-page">
       <div className="ui-page-wide">
-        <div className="mt-6 grid gap-12 md:mt-10 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
-          <div>
-            <p className="text-[15px] leading-none">
-              <Link href="/admin/orders" className="hover:underline">
-                ← Back to orders
-              </Link>
-            </p>
+        <p className="ui-admin-backlink">
+          <Link href="/admin/orders" className="hover:underline">
+            ← Back to orders
+          </Link>
+        </p>
 
-            <h1 className="mt-6 text-[24px] leading-none">Order #{order.id}</h1>
+        <div className="ui-admin-block grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-16">
+          <div>
+            <h1 className="text-[24px] leading-none">Order #{order.id}</h1>
 
             <p className="mt-3 text-[18px] leading-[1.2] opacity-80">
               Placed {formatDate(order.createdAt)}

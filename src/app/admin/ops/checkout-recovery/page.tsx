@@ -32,15 +32,15 @@ export default async function AdminCheckoutRecoveryPage() {
   ]);
 
   return (
-    <section className="mt-16 pb-24">
+    <section className="ui-admin-page">
       <div className="ui-page-wide">
-        <p className="text-[15px] leading-none">
+        <p className="ui-admin-backlink">
           <Link href="/admin/ops" className="hover:underline">
             ← Back to ops
           </Link>
         </p>
 
-        <div className="mt-10 border border-black p-5 md:p-6">
+        <div className="ui-admin-block border border-black p-5 md:p-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
             <div className="grid gap-6 md:grid-cols-2 md:gap-10">
               <div>
@@ -71,7 +71,7 @@ export default async function AdminCheckoutRecoveryPage() {
           </div>
         </div>
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1.45fr)_360px] lg:gap-12">
+        <div className="ui-admin-block grid gap-12 lg:grid-cols-[minmax(0,1.45fr)_360px] lg:gap-12">
           <div>
             <p className="text-[18px] leading-none">Missing orders</p>
 
