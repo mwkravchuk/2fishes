@@ -47,7 +47,7 @@ export function buildProductImageUploadKey(input: {
 
   const safeFilename = input.filename ? sanitizeFilename(input.filename) : "";
 
-  return `products/${safeSlug}-${timestamp}-${safeFilename || `image.${extension}`}`;
+  return `${process.env.S3_PREFIX}/products/${safeSlug}-${timestamp}-${safeFilename || `image.${extension}`}`;
 }
 
 export async function createPresignedProductImageUpload(input: {
