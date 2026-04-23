@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
@@ -44,12 +45,14 @@ export default async function CartPage() {
                     className="grid gap-4 py-4 md:grid-cols-[1.8fr_.8fr_.8fr_.8fr_.3fr] md:items-start md:gap-6 md:py-5"
                   >
                     <div className="flex items-start gap-5">
-                      <div className="ui-thumb-sm shrink-0">
+                      <div className="ui-thumb-sm relative shrink-0">
                         {item.product.imageKey ? (
-                          <img
+                          <Image
                             src={getProductImageUrl(item.product.imageKey)}
                             alt={item.productNameSnap}
-                            className="h-full w-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="66px"
                           />
                         ) : null}
                       </div>
@@ -57,7 +60,7 @@ export default async function CartPage() {
                       <div className="space-y-1">
                         <Link
                           href={`/shop/${item.product.slug}`}
-                          className="font-display ui-body hover:underline"
+                          className="font-display ui-body hover:underline leading-tight"
                         >
                           {item.productNameSnap}
                         </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { BagSize, GrindOption, Product } from "@prisma/client";
@@ -154,12 +155,15 @@ export function ProductForm({
     >
       <div className="space-y-6">
         <div>
-          <div className="ui-surface-muted aspect-square overflow-hidden">
+          <div className="ui-surface-muted relative aspect-square overflow-hidden">
             {previewUrl ? (
-              <img
+              <Image
                 src={previewUrl}
                 alt={product?.name ?? "Product preview"}
-                className="h-full w-full object-cover"
+                fill
+                unoptimized
+                className="object-cover"
+                sizes="300px"
               />
             ) : null}
           </div>

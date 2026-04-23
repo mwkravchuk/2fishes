@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import RoastScheduleNotice from "@/components/RoastScheduleNotice";
+import { emitCartChanged } from "@/lib/cart-events";
 
 type OrderItem = {
   id: string;
@@ -102,6 +103,12 @@ export default function SuccessOrderStatus({
     setIsPolling(true);
     setPollAttempt((attempt) => attempt + 1);
   }
+
+  useEffect(() => {
+    if (!order) return;
+
+    emitCartChanged(0);
+  }, [order]);
 
   if (!order) {
     return (

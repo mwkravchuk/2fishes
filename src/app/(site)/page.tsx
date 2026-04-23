@@ -1,3 +1,4 @@
+import Image from "next/image";
 import RoastScheduleNotice from "@/components/RoastScheduleNotice";
 
 export default function HomePage() {
@@ -25,11 +26,13 @@ export default function HomePage() {
 
         <div className="flex md:w-[52%] md:justify-start md:pt-8">
           <div className="w-full max-w-[520px] md:max-w-[620px]">
-            <div className="ui-surface-muted aspect-square">
-              <img
+            <div className="ui-surface-muted relative aspect-square">
+              <Image
                 src="/homepage.avif"
                 alt="The shadow of two fishes, the owners of the coffee roasting company"
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(min-width: 768px) 52vw, 100vw"
               />
             </div>
           </div>

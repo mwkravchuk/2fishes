@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getProductImageUrl } from "@/lib/product-images";
@@ -26,11 +27,13 @@ export default async function ShopPage() {
                   href={`/shop/${product.slug}`}
                   className="group block w-full max-w-none"
                 >
-                  <div className="ui-surface-muted aspect-square overflow-hidden">
-                    <img
+                  <div className="ui-surface-muted relative aspect-square overflow-hidden">
+                    <Image
                       src={imageUrl}
                       alt={product.name}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                     />
                   </div>
 

@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CART_CHANGED_EVENT } from "@/lib/cart-events";
 
@@ -43,6 +45,8 @@ export default function SiteHeaderClient({
   isLoggedIn,
   logoutAction,
 }: SiteHeaderClientProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [itemCount, setItemCount] = useState(0);
   const [cartPreview, setCartPreview] = useState<CartPreview>(emptyPreview);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -96,7 +100,7 @@ export default function SiteHeaderClient({
       isMounted = false;
       window.removeEventListener(CART_CHANGED_EVENT, handleCartChanged);
     };
-  }, []);
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     document.body.style.overflow =
@@ -110,12 +114,20 @@ export default function SiteHeaderClient({
   return (
     <>
       <nav className="sticky top-0 z-50 bg-(--background)">
-        <div className="ui-page-full flex items-center justify-between gap-4 py-3 md:flex-wrap md:items-start md:gap-x-6 md:gap-y-3 md:py-4">
+        <div className="ui-page-full flex items-center justify-between gap-4 py-5 md:flex-wrap md:items-start md:gap-x-6 md:gap-y-3 md:py-4">
           <Link
             href="/"
-            className="hidden font-display text-[16px] hover:underline md:inline"
+            className="relative hidden h-7 w-7 md:inline-block"
+            aria-label="Go to homepage"
           >
-            2fishes
+            <Image
+              src="/logo.png"
+              alt="2fishes"
+              fill
+              className="object-contain"
+              sizes="64px"
+              priority
+            />
           </Link>
 
           <div className="hidden items-center gap-8 text-[16px] md:flex md:gap-10">
@@ -151,7 +163,7 @@ export default function SiteHeaderClient({
             </button>
           </div>
 
-          <div className="flex w-full items-center justify-between text-[15px] md:hidden">
+          <div className="flex w-full items-center justify-between text-[16px] md:hidden">
             <button
               type="button"
               onClick={() => {
@@ -235,16 +247,6 @@ export default function SiteHeaderClient({
               Admin
             </Link>
           ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              setIsDrawerOpen(true);
-              setIsMenuOpen(false);
-            }}
-            className="block cursor-pointer"
-          >
-            Cart ({itemCount})
-          </button>
           {isLoggedIn && logoutAction ? (
             <form action={logoutAction}>
               <button className="block cursor-pointer text-left">
@@ -268,8 +270,8 @@ export default function SiteHeaderClient({
         }`}
         aria-hidden={!isDrawerOpen}
       >
-        <div className="px-[1.125rem] py-5 md:px-[var(--page-gutter-wide)] md:py-4">
-          <div className="flex justify-end">
+        <div className="px-[1.125rem] py-4 md:px-[var(--page-gutter-wide)]">
+          <div className="flex min-h-7 items-center justify-end">
             <button
               type="button"
               onClick={() => setIsDrawerOpen(false)}
@@ -280,7 +282,7 @@ export default function SiteHeaderClient({
             </button>
           </div>
 
-          <div className="mt-5 border-t border-black md:mt-4" />
+          <div className="mt-4 border-t border-black" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-[1.125rem] pb-5 md:px-[var(--page-gutter-wide)]">
@@ -295,12 +297,14 @@ export default function SiteHeaderClient({
                   key={item.id}
                   className="grid grid-cols-[84px_minmax(0,1fr)] gap-4 py-4"
                 >
-                  <div className="ui-thumb-md">
+                  <div className="ui-thumb-md relative">
                     {item.imageUrl ? (
-                      <img
+                      <Image
                         src={item.imageUrl}
                         alt={item.productName}
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="72px"
                       />
                     ) : null}
                   </div>

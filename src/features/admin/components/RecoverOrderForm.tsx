@@ -20,7 +20,7 @@ export default function RecoverOrderForm() {
   );
 
   return (
-    <div className="ui-panel-top">
+    <div>
       <p className="ui-body">Recover order from Stripe</p>
 
       <p className="ui-body-sm-relaxed ui-muted mt-3">

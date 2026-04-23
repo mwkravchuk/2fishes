@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getProductImageUrl } from "@/lib/product-images";
@@ -38,12 +39,14 @@ export default async function ProductDetailPage({
               </h1>
 
               <div className="mt-5">
-                <div className="ui-surface-muted aspect-[4/4.35] overflow-hidden">
+                <div className="ui-surface-muted relative aspect-[4/4.35] overflow-hidden">
                   {product.imageKey ? (
-                    <img
+                    <Image
                       src={getProductImageUrl(product.imageKey)}
                       alt={product.name}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 1024px) 430px, (min-width: 768px) 420px, 100vw"
                     />
                   ) : null}
                 </div>
@@ -54,9 +57,11 @@ export default async function ProductDetailPage({
           <div className="md:pt-8">
             <div className="border-t border-black pt-4">
               <div className="flex items-start justify-between gap-6">
-                <div className="max-w-[30ch] space-y-9">
-                  <p className="ui-body-loose max-w-[24ch]">{product.description}</p>
-                  <p className="ui-body whitespace-nowrap">
+                <div className="max-w-[31ch] space-y-2">
+                  <p className="ui-body-loose max-w-[24ch]">
+                    {product.description}
+                  </p>
+                  <p className="ui-body-sm-copy ui-muted whitespace-nowrap">
                     ({product.flavorNotes.join(", ")})
                   </p>
                 </div>
@@ -65,7 +70,7 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            <div className="mt-16 md:mt-24">
+            <div className="mt-10 md:mt-12">
               <AddToCartForm
                 productId={product.id}
                 selectedSize="oz12"

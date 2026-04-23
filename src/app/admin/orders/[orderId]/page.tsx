@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -68,12 +69,14 @@ export default async function AdminOrderDetailPage({
                       key={item.id}
                       className="grid grid-cols-[72px_minmax(0,1fr)] gap-4 border-b border-black/10 py-5 md:grid-cols-[72px_1fr_auto] md:gap-5"
                     >
-                      <div className="ui-thumb-md">
+                      <div className="ui-thumb-md relative">
                         {item.product?.imageKey ? (
-                          <img
+                          <Image
                             src={getProductImageUrl(item.product.imageKey)}
                             alt={item.productNameSnap}
-                            className="h-full w-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="72px"
                           />
                         ) : null}
                       </div>

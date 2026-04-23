@@ -5,8 +5,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-[760px]">
           <div>
             <p className="ui-body-loose">
-              2fishes is a small coffee project built around getting better on
-              purpose. We are learning how to roast, tasting critically, and
+              2fishes is a small coffee project built around getting better purposefully. we are learning how to roast, tasting critically, and
               trying to make coffee that keeps improving batch after batch.
             </p>
           </div>

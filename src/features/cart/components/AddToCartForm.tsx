@@ -70,7 +70,7 @@ export default function AddToCartForm({
   }
 
   return (
-    <div className="border border-black px-5 py-5 md:px-7 md:py-6">
+    <div className="border border-black px-5 py-6 md:px-7 md:py-7">
       <div className="space-y-7">
         <div>
           <p className="ui-caption tracking-[0.08em] uppercase">Purchase</p>
@@ -116,7 +116,7 @@ export default function AddToCartForm({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4 pt-12">
           <button
             type="button"
             onClick={handleAddToCart}

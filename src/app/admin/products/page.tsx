@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getProductImageUrl } from "@/lib/product-images";
@@ -28,16 +29,18 @@ export default async function AdminProductsPage() {
               >
                 <div
                   className={[
-                    "ui-surface-muted aspect-[5/5] overflow-hidden transition-all",
+                    "ui-surface-muted relative aspect-[5/5] overflow-hidden transition-all",
                     product.isActive
                       ? "opacity-100"
                       : "opacity-60 grayscale hover:grayscale-0 hover:opacity-100",
                   ].join(" ")}
                 >
-                  <img
+                  <Image
                     src={imageUrl}
                     alt={product.name}
-                    className="h-full w-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 768px) 280px, 50vw"
                   />
                 </div>
 
