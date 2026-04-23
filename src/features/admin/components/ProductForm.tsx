@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import NextImage from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { BagSize, GrindOption, Product } from "@prisma/client";
@@ -157,7 +157,7 @@ export function ProductForm({
         <div>
           <div className="ui-surface-muted relative aspect-square overflow-hidden">
             {previewUrl ? (
-              <Image
+              <NextImage
                 src={previewUrl}
                 alt={product?.name ?? "Product preview"}
                 fill
@@ -414,7 +414,7 @@ async function createSquareUploadFile(file: File, slug: string) {
 function loadImage(file: File) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file);
-    const image = new Image();
+    const image = new window.Image();
 
     image.onload = () => {
       URL.revokeObjectURL(objectUrl);
