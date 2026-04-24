@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="md:w-[38%]">
           <div className="max-w-[420px]">
             <p className="font-display text-[64px] leading-[0.92] tracking-[-0.03em] sm:text-[88px] md:text-[120px] lg:text-[140px]">
-              2fishes
+              twofishes
             </p>
 
             <div className="mt-4">
