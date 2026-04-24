@@ -1,17 +1,47 @@
 import { Resend } from "resend";
 
-export const EMAIL_FROM = process.env.EMAIL_FROM;
-export const EMAIL_REPLY_TO = process.env.EMAIL_REPLY_TO;
-export const INTERNAL_ORDER_EMAIL = process.env.INTERNAL_ORDER_EMAIL;
+export type EmailConfig = {
+  resendApiKey: string;
+  from: string;
+  replyTo?: string;
+  internalOrderEmail: string;
+};
 
-export function hasEmailConfig() {
-  return Boolean(process.env.RESEND_API_KEY);
+export function getMissingEmailConfigKeys() {
+  return ["RESEND_API_KEY", "EMAIL_FROM", "INTERNAL_ORDER_EMAIL"].filter(
+    (key) => !process.env[key]
+  );
 }
 
-export function getResendClient() {
-  if (!process.env.RESEND_API_KEY) {
+export function getEmailConfig(): EmailConfig | null {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM;
+  const internalOrderEmail = process.env.INTERNAL_ORDER_EMAIL;
+
+  if (!resendApiKey || !from || !internalOrderEmail) {
     return null;
   }
 
-  return new Resend(process.env.RESEND_API_KEY);
+  return {
+    resendApiKey,
+    from,
+    replyTo: process.env.EMAIL_REPLY_TO,
+    internalOrderEmail,
+  };
+}
+
+export function getInternalOrderEmail() {
+  return process.env.INTERNAL_ORDER_EMAIL ?? null;
+}
+
+export function hasEmailConfig() {
+  return getEmailConfig() !== null;
+}
+
+export function getResendClient(apiKey = process.env.RESEND_API_KEY) {
+  if (!apiKey) {
+    return null;
+  }
+
+  return new Resend(apiKey);
 }

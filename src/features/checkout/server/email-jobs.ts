@@ -7,11 +7,10 @@ import {
 } from "@/lib/email-templates";
 import { logError, logInfo, logWarn } from "@/lib/logging";
 import {
-  EMAIL_FROM,
-  EMAIL_REPLY_TO,
-  INTERNAL_ORDER_EMAIL,
+  getEmailConfig,
+  getInternalOrderEmail,
+  getMissingEmailConfigKeys,
   getResendClient,
-  hasEmailConfig,
 } from "@/lib/email";
 
 function buildOrderEmailData(order: {
@@ -63,6 +62,12 @@ export async function enqueueOrderEmailJobsTx(
     customerEmail: string;
   }
 ) {
+  const internalOrderEmail = getInternalOrderEmail();
+
+  if (!internalOrderEmail) {
+    throw new Error("Missing INTERNAL_ORDER_EMAIL");
+  }
+
   await tx.emailJob.createMany({
     data: [
       {
@@ -73,7 +78,7 @@ export async function enqueueOrderEmailJobsTx(
       {
         orderId: input.orderId,
         type: "internal_new_order",
-        recipient: INTERNAL_ORDER_EMAIL,
+        recipient: internalOrderEmail,
       },
     ],
   });
@@ -122,16 +127,24 @@ export async function processEmailJob(jobId: string) {
     return;
   }
 
-  if (!hasEmailConfig()) {
+  const emailConfig = getEmailConfig();
+
+  if (!emailConfig) {
+    const missingKeys = getMissingEmailConfigKeys();
     logWarn("email_job_config_missing", {
       emailJobId: job.id,
       orderId: job.orderId,
+      missingKeys,
     });
-    await markEmailJobFailed(job.id, job.attempts + 1, "Missing RESEND_API_KEY");
+    await markEmailJobFailed(
+      job.id,
+      job.attempts + 1,
+      `Missing email config: ${missingKeys.join(", ")}`
+    );
     return;
   }
 
-  const resend = getResendClient();
+  const resend = getResendClient(emailConfig.resendApiKey);
 
   if (!resend) {
     logError("email_job_client_unavailable", {
@@ -158,7 +171,7 @@ export async function processEmailJob(jobId: string) {
     const recipient =
       job.type === "order_confirmation"
         ? job.order.customerEmail
-        : INTERNAL_ORDER_EMAIL;
+        : emailConfig.internalOrderEmail;
 
     const payload =
       job.type === "order_confirmation"
@@ -166,9 +179,9 @@ export async function processEmailJob(jobId: string) {
         : buildInternalNewOrderEmail(emailData);
 
     const result = await resend.emails.send({
-      from: EMAIL_FROM,
+      from: emailConfig.from,
       to: [recipient],
-      replyTo: EMAIL_REPLY_TO,
+      replyTo: emailConfig.replyTo,
       subject: payload.subject,
       html: payload.html,
       text: payload.text,
@@ -236,11 +249,15 @@ export async function sendShipmentEmailNow(orderId: string) {
     throw new Error("Order not found");
   }
 
-  if (!hasEmailConfig()) {
-    throw new Error("Missing RESEND_API_KEY");
+  const emailConfig = getEmailConfig();
+
+  if (!emailConfig) {
+    throw new Error(
+      `Missing email config: ${getMissingEmailConfigKeys().join(", ")}`
+    );
   }
 
-  const resend = getResendClient();
+  const resend = getResendClient(emailConfig.resendApiKey);
 
   if (!resend) {
     throw new Error("Resend client unavailable");
@@ -248,9 +265,9 @@ export async function sendShipmentEmailNow(orderId: string) {
 
   const payload = buildOrderShippedEmail(buildOrderEmailData(order));
   const result = await resend.emails.send({
-    from: EMAIL_FROM,
+    from: emailConfig.from,
     to: [order.customerEmail],
-    replyTo: EMAIL_REPLY_TO,
+    replyTo: emailConfig.replyTo,
     subject: payload.subject,
     html: payload.html,
     text: payload.text,
