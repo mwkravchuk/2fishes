@@ -56,19 +56,49 @@ function buildShippingLines(order: OrderEmailData) {
   ].filter(Boolean) as string[];
 }
 
-export function buildCustomerOrderConfirmationEmail(order: OrderEmailData) {
-  const itemsHtml = order.items
+function buildEmailHtml(body: string) {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <meta name="color-scheme" content="light only">
+        <meta name="supported-color-schemes" content="light only">
+        <style>
+          :root {
+            color-scheme: light only;
+            supported-color-schemes: light only;
+          }
+          body, div, p, pre, strong {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+          }
+        </style>
+      </head>
+      <body bgcolor="#ffffff" style="background-color: #ffffff !important; color: #000000 !important; margin: 0; padding: 0;">
+        <div bgcolor="#ffffff" style="background-color: #ffffff !important; color: #000000 !important; margin: 0; padding: 0;">
+          <div style="background-color: #ffffff !important; color: #000000 !important; font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.5; max-width: 560px; margin: 0 auto; padding: 24px;">
+            ${body}
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+function buildSectionTitle(label: string) {
+  return `<p style="color: #000000 !important; font-size: 16px; font-weight: 700; margin: 24px 0 8px;">${label}</p>`;
+}
+
+function buildShippingLinesHtml(lines: string[]) {
+  return lines
     .map(
-      (item) => `
-        <tr>
-          <td style="padding: 8px 0;">${item.productNameSnap}</td>
-          <td style="padding: 8px 0;">${formatBagSize(item.selectedSize)} / ${formatGrind(item.selectedGrind)}</td>
-          <td style="padding: 8px 0; text-align: right;">x${item.quantity}</td>
-        </tr>
-      `
+      (line) =>
+        `<p style="color: #000000 !important; font-size: 16px; margin: 0 0 2px;">${line}</p>`
     )
     .join("");
+}
 
+export function buildCustomerOrderConfirmationEmail(order: OrderEmailData) {
   const itemsText = order.items
     .map(
       (item) =>
@@ -80,35 +110,29 @@ export function buildCustomerOrderConfirmationEmail(order: OrderEmailData) {
 
   return {
     subject: `We have received your order.`,
-    html: `
-      <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
-        <h1 style="font-size: 28px; margin-bottom: 16px;">Thank you for your order!</h1>
+    html: buildEmailHtml(`
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;">Thank you for your order!</p>
 
-        <p>Your order <strong>#${order.orderId}</strong> has been received.</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;">Your order <strong>#${order.orderId}</strong> has been received.</p>
 
-        <p>Orders are batch roasted on Saturday and typically shipped the following Monday. You will receive tracking information once the order has shipped.</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;">Orders are batch roasted on Saturday and typically shipped the following Monday. You will receive tracking information once the order has shipped.</p>
 
-        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Order summary</h2>
-        <table style="width: 100%; border-collapse: collapse;">
-          ${itemsHtml}
-        </table>
+      ${buildSectionTitle("Order summary")}
+      <pre style="color: #000000 !important; font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${itemsText}</pre>
 
-        <div style="margin-top: 20px;">
-          <p style="margin: 4px 0;">Subtotal: ${formatPrice(order.subtotalCents)}</p>
-          <p style="margin: 4px 0;">Shipping: ${formatPrice(order.shippingCents)}</p>
-          <p style="margin: 4px 0;"><strong>Total: ${formatPrice(order.totalCents)}</strong></p>
-        </div>
-
-        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Shipping to</h2>
-        <div>
-          ${shippingLines.map((line) => `<p style="margin: 2px 0;">${line}</p>`).join("")}
-        </div>
-
-        <p style="margin-top: 32px;">If anything looks off, just reply to this email.</p>
+      <div style="margin-top: 16px;">
+        <p style="color: #000000 !important; font-size: 16px; margin: 0 0 2px;">Subtotal: ${formatPrice(order.subtotalCents)}</p>
+        <p style="color: #000000 !important; font-size: 16px; margin: 0 0 2px;">Shipping: ${formatPrice(order.shippingCents)}</p>
+        <p style="color: #000000 !important; font-size: 16px; margin: 0;"><strong>Total: ${formatPrice(order.totalCents)}</strong></p>
       </div>
-    `,
+
+      ${buildSectionTitle("Shipping to")}
+      ${buildShippingLinesHtml(shippingLines)}
+
+      <p style="color: #000000 !important; font-size: 16px; margin: 24px 0 0;">If anything looks off, just reply to this email.</p>
+    `),
     text: `
-Thank you for your order
+Thank you for your order!
 
 Your order #${order.orderId} has been received.
 
@@ -139,15 +163,13 @@ export function buildInternalNewOrderEmail(order: OrderEmailData) {
 
   return {
     subject: `New order received.`,
-    html: `
-      <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
-        <h1 style="font-size: 24px; margin-bottom: 16px;">New order received</h1>
-        <p><strong>Order:</strong> #${order.orderId}</p>
-        <p><strong>Email:</strong> ${order.customerEmail}</p>
-        <p><strong>Total:</strong> ${formatPrice(order.totalCents)}</p>
-        <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${itemsText}</pre>
-      </div>
-    `,
+    html: buildEmailHtml(`
+      <p style="color: #000000 !important; font-size: 16px; font-weight: 700; margin: 0 0 16px;">New order received</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 2px;"><strong>Order:</strong> #${order.orderId}</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 2px;"><strong>Email:</strong> ${order.customerEmail}</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;"><strong>Total:</strong> ${formatPrice(order.totalCents)}</p>
+      <pre style="color: #000000 !important; font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${itemsText}</pre>
+    `),
     text: `
 New order received
 
@@ -180,29 +202,25 @@ export function buildOrderShippedEmail(order: OrderEmailData & {
 
   return {
     subject: `Your order is on the way!`,
-    html: `
-      <div style="font-family: 'Times New Roman', serif; color: #111; max-width: 640px; margin: 0 auto; line-height: 1.5;">
-        <h1 style="font-size: 28px; margin-bottom: 16px;">Your order is on the way!</h1>
+    html: buildEmailHtml(`
+      <p style="color: #000000 !important; font-size: 16px; font-weight: 700; margin: 0 0 16px;">Your order is on the way!</p>
 
-        <p>Your order <strong>#${order.orderId}</strong> has been fulfilled.</p>
+      <p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;">Your order <strong>#${order.orderId}</strong> has been fulfilled.</p>
 
-        ${
-          order.trackingNumber
-            ? `<p><strong>Tracking:</strong> ${order.trackingCarrier ? `${order.trackingCarrier} ` : ""}${order.trackingNumber}</p>`
-            : ""
-        }
+      ${
+        order.trackingNumber
+          ? `<p style="color: #000000 !important; font-size: 16px; margin: 0 0 16px;"><strong>Tracking:</strong> ${order.trackingCarrier ? `${order.trackingCarrier} ` : ""}${order.trackingNumber}</p>`
+          : ""
+      }
 
-        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Order summary</h2>
-        <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${itemsText}</pre>
+      ${buildSectionTitle("Order summary")}
+      <pre style="color: #000000 !important; font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${itemsText}</pre>
 
-        <h2 style="font-size: 18px; margin-top: 32px; margin-bottom: 12px;">Shipping to</h2>
-        <div>
-          ${shippingLines.map((line) => `<p style="margin: 2px 0;">${line}</p>`).join("")}
-        </div>
+      ${buildSectionTitle("Shipping to")}
+      ${buildShippingLinesHtml(shippingLines)}
 
-        <p style="margin-top: 32px;">If anything looks off, just reply to this email.</p>
-      </div>
-    `,
+      <p style="color: #000000 !important; font-size: 16px; margin: 24px 0 0;">If anything looks off, just reply to this email.</p>
+    `),
     text: `
 Your order is on the way
 
