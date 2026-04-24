@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 
-export const EMAIL_FROM = "2fishes Coffee <onboarding@resend.dev>";
-export const EMAIL_REPLY_TO = "mwkravchuk@gmail.com";
-export const INTERNAL_ORDER_EMAIL = "mwkravchuk@gmail.com";
+export const EMAIL_FROM = process.env.EMAIL_FROM;
+export const EMAIL_REPLY_TO = process.env.EMAIL_REPLY_TO;
+export const INTERNAL_ORDER_EMAIL = process.env.INTERNAL_ORDER_EMAIL;
 
 export function hasEmailConfig() {
   return Boolean(process.env.RESEND_API_KEY);
