@@ -12,6 +12,9 @@ import { prisma } from "@/lib/prisma";
 
 
 export async function POST() {
+  const CHECKOUT_ERROR_MESSAGE =
+    "We couldn’t start checkout right now. Please try again in a moment or contact us if the issue continues.";
+
   try {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(CART_COOKIE_NAME)?.value;
@@ -177,10 +180,7 @@ export async function POST() {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to create checkout session",
+        error: CHECKOUT_ERROR_MESSAGE,
       },
       { status: 500 }
     );
